@@ -40,5 +40,5 @@ chmod +x "$PAYLOAD/FlyCast.sh"
 
 # 4) QNAP App Center icons at payload root
 python3 build/make_icons.py "$PAYLOAD"
-
+cp "QPKG/icons/FlyCast.svg" "$PAYLOAD/.qpkg_icon.svg"
 echo "payload ready:"; ls -la "$PAYLOAD"
