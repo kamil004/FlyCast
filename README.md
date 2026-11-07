@@ -1,6 +1,6 @@
-FlyCast — Lightweight video streaming for QNAP servers with Intel processors
+FlyCast — Lightweight video streaming app with no bloat. Built for QNAP servers with Intel processors.
 
-Lightweight Plex/Emby-like video app with no bloat. Built for QNAP servers with Intel processors.
+
 
 ![FlyCast - Library View](/docs/screenshot.jpg)
 
