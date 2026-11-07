@@ -1,5 +1,5 @@
 <template>
-  <main class="page">
+  <main class="page" v-if="auth.initialized">
     <div class="panel">
       <h2>{{ t('settings.title') }}</h2>
       <p class="muted">{{ t('settings.subtitle') }}</p>
@@ -316,8 +316,9 @@ async function removeUser(u) {
 }
 
 onMounted(() => {
-  load()
-  loadLibraries()
+  console.log('Settings mounted, auth:', auth.user?.username, 'isAdmin:', auth.isAdmin, 'initialized:', auth.initialized)
+  load().then(() => console.log('Users loaded:', users.value.length)).catch(e => console.error('Load users failed:', e))
+  loadLibraries().then(() => console.log('Libraries loaded:', libraries.value.length)).catch(e => console.error('Load libs failed:', e))
 })
 </script>
 
