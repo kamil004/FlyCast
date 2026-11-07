@@ -1,0 +1,53 @@
+#!/bin/sh
+CONF=/etc/config/qpkg.conf
+QPKG_NAME="FlyCast"
+QPKG_ROOT=`/sbin/getcfg $QPKG_NAME Install_Path -f ${CONF}`
+DAEMON="${QPKG_ROOT}/app/flycast"
+PIDFILE="${QPKG_ROOT}/shared/flycast.pid"
+LOGFILE="${QPKG_ROOT}/shared/logs/flycast.log"
+export FLYCAST_HOME="${QPKG_ROOT}/shared"
+export FLYCAST_WEBROOT="${QPKG_ROOT}/app/web"
+export FLYCAST_PORT=8100
+
+case "$1" in
+  start)
+    ENABLED=$(/sbin/getcfg $QPKG_NAME Enable -u -d FALSE -f $CONF)
+    if [ "$ENABLED" != "TRUE" ]; then
+      echo "$QPKG_NAME is disabled."
+      exit 1
+    fi
+    if [ -f $PIDFILE ] && kill -0 `cat $PIDFILE` 2>/dev/null; then
+      echo "$QPKG_NAME already running"
+      exit 0
+    fi
+    mkdir -p "${QPKG_ROOT}/shared/{config,db,thumbs,logs,cache}"
+    cd "${QPKG_ROOT}"
+    $DAEMON >> $LOGFILE 2>&1 &
+    echo $! > $PIDFILE
+    echo "$QPKG_NAME started"
+    ;;
+  stop)
+    if [ -f $PIDFILE ]; then
+      kill `cat $PIDFILE` 2>/dev/null
+      rm -f $PIDFILE
+    fi
+    echo "$QPKG_NAME stopped"
+    ;;
+  restart)
+    $0 stop
+    sleep 2
+    $0 start
+    ;;
+  status)
+    if [ -f $PIDFILE ] && kill -0 `cat $PIDFILE` 2>/dev/null; then
+      echo "$QPKG_NAME is running"
+    else
+      echo "$QPKG_NAME is stopped"
+    fi
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|restart|status}"
+    exit 1
+    ;;
+esac
+exit 0

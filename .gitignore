@@ -1,0 +1,25 @@
+# Build outputs
+/build/payload/
+/build/vendor/
+/build/__pycache__/
+*.qpkg
+QPKG/app/
+
+# Go
+/backend/flycast
+/backend/flycast_amd64
+/backend/flycast_arm64
+/backend/backend/
+
+# Frontend
+/frontend/node_modules/
+/frontend/dist/
+/frontend/frontend/
+
+# OS / editor
+.DS_Store
+Icon
+.vscode/
+
+# Docs / reports
+EXPLORATION_REPORT.md

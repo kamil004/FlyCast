@@ -1,0 +1,20 @@
+{
+  "package": "FlyCast",
+  "name": "FlyCast",
+  "version": "0.1.0",
+  "qts_version_min": "5.0.0",
+  "description": "Lekka aplikacja wideo typu Plex/Emby bez zbędnych wodotrysków.",
+  "author": "Kamil",
+  "ports": [
+    {
+      "type": "http",
+      "port": 8100
+    }
+  ],
+  "architecture": [
+    "x86_64",
+    "aarch64",
+    "arm_64"
+  ],
+  "firmware": "5.0.0"
+}
