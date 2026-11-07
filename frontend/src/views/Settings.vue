@@ -187,9 +187,7 @@ const form = reactive({
 })
 
 function acctLabel(u) {
-  return u.is_admin ? 'admin' : u.is_guest ? 'gość' : 'użytkownik'
   return u.is_admin ? t('settings.type_admin') : u.is_guest ? t('settings.type_guest') : t('settings.type_user')
-  return u.is_admin ? 'admin' : u.is_guest ? 'guest' : 'user'
 }
 
 async function load() {
