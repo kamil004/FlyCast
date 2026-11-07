@@ -25,8 +25,9 @@
             <span class="tag" :class="acctClass(u)">{{ acctLabel(u) }}</span>
             <span class="tag scope" v-if="!u.is_admin">
               {{ u.restricted ? `${(u.library_ids || []).length} ${t('settings.libs_count')}` : t('settings.all_libs_short') }}
-            <span class="tag you" v-if="u.id === me?.id">to Ty</span>
+            </span>
             <span class="tag you" v-if="u.id === me?.id">{{ t('settings.is_you') }}</span>
+            <button
               v-if="isAdmin"
               class="icon-btn"
               :title="t('settings.edit_user')"

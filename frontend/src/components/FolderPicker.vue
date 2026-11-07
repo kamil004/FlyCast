@@ -22,7 +22,6 @@
             <span>..</span>
           </div>
           <div v-if="!dirs.length && !parent" class="muted" style="padding:14px">{{ t('folderpicker.no_folders') }}</div>
-          </div>
           <div
             v-for="d in dirs"
             :key="d.path"
@@ -34,7 +33,6 @@
           </div>
         </template>
       </div>
-
       <div class="modal-foot">
         <span class="muted" style="overflow:hidden;text-overflow:ellipsis">{{ current || '—' }}</span>
         <div class="spacer"></div>
