@@ -1,5 +1,9 @@
 <template>
   <main class="page">
+    <div v-if="isGuest" class="empty-state">
+      <div class="big">🔒</div>
+      <div>{{ t('settings.guest_no_access') }}</div>
+    </div>
     <div class="panel">
       <h2>{{ t('settings.title') }}</h2>
       <p class="muted">{{ t('settings.subtitle') }}</p>
@@ -176,6 +180,7 @@ const editOk = ref(false)
 
 const me = computed(() => auth.user)
 const isAdmin = computed(() => !!auth.user?.is_admin)
+const isGuest = computed(() => !!auth.user?.is_guest)
 
 const form = reactive({
   username: '',
@@ -462,6 +467,19 @@ onMounted(() => {
 }
 .chip.ok {
   color: #7ee0a1;
+}
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 60px 20px;
+  color: var(--dim);
+}
+.empty-state .big {
+  font-size: 48px;
+  opacity: 0.5;
 }
 .modal-backdrop {
   position: fixed;
