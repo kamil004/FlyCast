@@ -46,7 +46,7 @@
         </router-link>
       </template>
 
-      <router-link to="/settings" :class="{ active: route.name === 'settings' }">
+      <router-link v-if="auth.user && !auth.isGuest" to="/settings" :class="{ active: route.name === 'settings' }">
         <span class="ico">⚙️</span>
         <span>{{ t('sidebar.settings') }}</span>
       </router-link>

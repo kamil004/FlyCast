@@ -9,9 +9,9 @@
       <p class="muted">{{ t('settings.subtitle') }}</p>
       <div class="kv">
         <span>{{ t('settings.version') }}</span>
-        <span>0.1.0</span>
+        <span>{{ appVersion }}</span>
         <span>{{ t('settings.http_port') }}</span>
-        <span>8100</span>
+        <span>{{ httpPort }}</span>
         <span>Streaming</span>
         <span>Direct Play + remux + transkodowanie</span>
       </div>
@@ -163,8 +163,9 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import axios from 'axios'
 import { useAuthStore } from '@/stores/auth.js'
 import { t } from '@/i18n'
-
+const appVersion = import.meta.env.VITE_FLYCAST_VERSION || '0.1.0'
 const API = '/api'
+const httpPort = '8100'
 const auth = useAuthStore()
 const users = ref([])
 const libraries = ref([])
