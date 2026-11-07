@@ -1,5 +1,5 @@
 <template>
-  <main class="page" v-if="auth.initialized">
+  <main class="page">
     <div class="panel">
       <h2>{{ t('settings.title') }}</h2>
       <p class="muted">{{ t('settings.subtitle') }}</p>
@@ -189,6 +189,9 @@ const form = reactive({
 function acctLabel(u) {
   return u.is_admin ? t('settings.type_admin') : u.is_guest ? t('settings.type_guest') : t('settings.type_user')
 }
+function acctClass(u) {
+  return u.is_admin ? 'admin' : u.is_guest ? 'guest' : 'user'
+}
 
 async function load() {
   try {
@@ -316,9 +319,8 @@ async function removeUser(u) {
 }
 
 onMounted(() => {
-  console.log('Settings mounted, auth:', auth.user?.username, 'isAdmin:', auth.isAdmin, 'initialized:', auth.initialized)
-  load().then(() => console.log('Users loaded:', users.value.length)).catch(e => console.error('Load users failed:', e))
-  loadLibraries().then(() => console.log('Libraries loaded:', libraries.value.length)).catch(e => console.error('Load libs failed:', e))
+  load()
+  loadLibraries()
 })
 </script>
 
