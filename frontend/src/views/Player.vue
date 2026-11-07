@@ -2,13 +2,13 @@
   <main class="page">
     <div class="player-wrap" ref="wrapRef">
       <div class="top" v-show="ui.show">
-        <button class="btn ghost" @click="$router.back()">← Powrót</button>
+        <button class="btn ghost" @click="$router.back()">← Back</button>
         <div class="title-wrap">
           <span class="title">{{ info.title || info.filename }}</span>
           <span class="muted" v-if="info.year">{{ info.year }}</span>
         </div>
         <div class="spacer"></div>
-        <router-link class="btn" :to="{ name: 'detail', params: { id: route.params.id } }">ⓘ Szczegóły</router-link>
+        <router-link class="btn" :to="{ name: 'detail', params: { id: route.params.id } }">ⓘ Details</router-link>
       </div>
       <div class="stage" ref="stageRef" :style="stageStyle" @mousemove="showUI" @click="togglePlay" @dblclick="toggleFullscreen">
         <video ref="videoRef" class="video-js vjs-big-play-centered" playsinline></video>
@@ -37,7 +37,7 @@
               <transition name="qmenu">
                 <div v-if="qualityMenuOpen" class="quality-dropdown" @click.stop>
                   <div class="q-source" :class="{active: qualityMode==='source'}" @click="selectQuality('source')">
-                    <span class="q-label">Oryginał</span>
+                    <span class="q-label">Original</span>
                     <span class="q-bit">{{ sourceBitrateKbps }} kbps</span>
                   </div>
                   <div class="q-divider"></div>
@@ -62,7 +62,7 @@
       </div>
       <div v-if="errorMsg" class="error-banner">
         ⚠️ {{ errorMsg }}
-        <button class="btn" @click="forceTranscode">Spróbuj transkodować</button>
+        <button class="btn" @click="forceTranscode">Try transcoding</button>
       </div>
     </div>
   </main>
@@ -128,10 +128,10 @@ const qualityOptions = computed(() => {
   const src = sourceBitrate.value
   if (src <= 0) {
     return [
-      { label: 'Niska (1 000 kbps)', bitrate: 1000 },
-      { label: 'Średnia (2 500 kbps)', bitrate: 2500 },
-      { label: 'Wysoka (5 000 kbps)', bitrate: 5000 },
-      { label: 'Bardzo wysoka (8 000 kbps)', bitrate: 8000 },
+      { label: 'Low (1,000 kbps)', bitrate: 1000 },
+      { label: 'Medium (2,500 kbps)', bitrate: 2500 },
+      { label: 'High (5,000 kbps)', bitrate: 5000 },
+      { label: 'Very high (8,000 kbps)', bitrate: 8000 },
     ]
   }
   // Suggest bitrates relative to source
@@ -185,11 +185,11 @@ const targetBitrate = computed(() => {
 // qualityLabel: displayed on the button
 const qualityLabel = computed(() => {
   if (qualityMode.value === 'source') {
-    return 'Jakość: Oryginał'
+    return 'Quality: Original'
   }
   const b = customBitrate.value
-  if (b >= 1000) return 'Jakość: ' + (b/1000).toFixed(1) + ' Mbps'
-  return 'Jakość: ' + b + ' kbps'
+  if (b >= 1000) return 'Quality: ' + (b/1000).toFixed(1) + ' Mbps'
+  return 'Quality: ' + b + ' kbps'
 })
 
 // buildStreamUrl: builds the stream URL with appropriate bitrate/transcode params
@@ -234,7 +234,7 @@ function forceTranscode(){ window.location.reload() }
 function fmt(s){ if(!s||isNaN(s)||s<0) return '0:00'; const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=Math.floor(s%60); return h>0?`${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`:`${m}:${String(sec).padStart(2,'0')}`}
 function showHud(i,t,el=0,du=0){ hud.value={show:true,icon:i,text:t,time:el>0?fmt(el)+' / '+fmt(du):''}; if(hudTimer) clearTimeout(hudTimer); hudTimer=setTimeout(()=>{hud.value.show=false},900)}
 function showUI(){ ui.value.show=true; if(uiTimer) clearTimeout(uiTimer); uiTimer=setTimeout(()=>{ui.value.show=false},3000)}
-function togglePlay(e){ if(e) e.stopPropagation(); if(!player.value) return; if(player.value.paused()){ player.value.play(); playing.value=true; showHud('▶','Odtwarzanie') } else { player.value.pause(); playing.value=false; showHud('⏸','Pauza') }}
+function togglePlay(e){ if(e) e.stopPropagation(); if(!player.value) return; if(player.value.paused()){ player.value.play(); playing.value=true; showHud('▶','Playing') } else { player.value.pause(); playing.value=false; showHud('⏸','Paused') }}
 
 // getEffectiveTime: returns the displayed currentTime. For transcoded streams
 // the player reports time from 0 (fresh pipe), so we track the offset ourselves.
@@ -289,7 +289,7 @@ function selectQuality(mode, bitrate){
     qualityMode.value = 'source'
     const pos = getEffectiveTime()
     reloadStream(pos)
-    showHud('🎯', 'Oryginał')
+    showHud('🎯', 'Original')
   } else {
     qualityMode.value = 'custom'
     customBitrate.value = bitrate
@@ -300,7 +300,7 @@ function selectQuality(mode, bitrate){
   }
 }
 
-function toggleMute(){ if(player.value){ player.value.muted(!player.value.muted()); muted.value=player.value.muted(); showHud(muted.value?'🔇':'🔊', muted.value?'Wyciszony':'Włączony') }}
+function toggleMute(){ if(player.value){ player.value.muted(!player.value.muted()); muted.value=player.value.muted(); showHud(muted.value?'🔇':'🔊', muted.value?'Muted':'Unmuted') }}
 function setVol(e){ const v=Number(e.target.value); volume.value=v; localStorage.setItem('flycast_vol', String(v)); if(player.value){ player.value.volume(v); player.value.muted(false); muted.value=false }}
 function cycleRate(){ const r=[1,1.25,1.5,1.75,2,0.75,0.5]; const i=(r.indexOf(rate.value)+1)%r.length; rate.value=r[i]; if(player.value){ player.value.playbackRate(rate.value); showHud('⚡', rate.value+'x') }}
 function toggleFullscreen(){ const el=wrapRef.value||stageRef.value||document.body; if(!document.fullscreenElement){ el.requestFullscreen?.().catch(()=>{}) } else { document.exitFullscreen?.() }}

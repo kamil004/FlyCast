@@ -3,11 +3,11 @@
     <div class="thumb">
       <img v-if="thumbSrc" :src="thumbSrc" :alt="item.title" @error="failed = true" v-show="!failed" />
       <div v-if="!thumbSrc || failed" class="ph">🎞️</div>
-      <button class="play" title="Odtwórz" @click.prevent.stop="play">▶</button>
+      <button class="play" title="Play" @click.prevent.stop="play">▶</button>
       <button
         class="fav"
         :class="{ active: isFav }"
-        :title="isFav ? 'Usuń z ulubionych' : 'Dodaj do ulubionych'"
+        :title="isFav ? 'Remove from favorites' : 'Add to favorites'"
         @click.prevent.stop="toggleFav"
       >{{ isFav ? '★' : '☆' }}</button>
       <span v-if="duration" class="dur">{{ duration }}</span>
@@ -84,7 +84,7 @@ function fmtSize(bytes) {
 const sub = computed(() => {
   const parts = []
   if (props.item.year) parts.push(props.item.year)
-  if (props.item.progress) parts.push('Kontynuuj')
+  if (props.item.progress) parts.push('Continue')
   if (props.list) {
     const d = props.item.created_at ? fmtDate(props.item.created_at) : ''
     if (d) parts.push(d)

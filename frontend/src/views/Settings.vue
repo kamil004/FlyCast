@@ -1,12 +1,12 @@
 <template>
   <main class="page">
     <div class="panel">
-      <h2>Ustawienia</h2>
-      <p class="muted">Podstawowe informacje o FlyCast</p>
+      <h2>Settings</h2>
+      <p class="muted">Basic information about FlyCast</p>
       <div class="kv">
-        <span>Wersja</span>
+        <span>Version</span>
         <span>0.1.0</span>
-        <span>Port HTTP</span>
+        <span>HTTP Port</span>
         <span>8100</span>
         <span>Streaming</span>
         <span>Direct Play + remux + transkodowanie</span>
@@ -14,7 +14,7 @@
     </div>
 
     <div class="panel">
-      <h3>Użytkownicy</h3>
+      <h3>Users</h3>
       <div class="users">
         <div v-for="u in users" :key="u.id" class="user">
           <div class="wholine">
@@ -30,13 +30,13 @@
             <button
               v-if="isAdmin"
               class="icon-btn"
-              title="Edytuj użytkownika"
+              title="Edit user"
               @click="openEdit(u)"
             >✏️</button>
             <button
               v-if="isAdmin && u.id !== me?.id"
               class="icon-btn danger"
-              title="Usuń użytkownika"
+              title="Delete user"
               @click="removeUser(u)"
             >🗑️</button>
           </div>
@@ -44,109 +44,109 @@
       </div>
 
       <template v-if="isAdmin">
-        <h3 style="margin-top:8px">Dodaj użytkownika</h3>
+        <h3 style="margin-top:8px">Add user</h3>
         <form class="create-form" @submit.prevent="createUser">
-          <input class="input" v-model="form.username" placeholder="Nazwa użytkownika" autocomplete="off" />
-          <input class="input" v-model="form.display" placeholder="Nazwa wyświetlana (opcjonalnie)" autocomplete="off" />
+          <input class="input" v-model="form.username" placeholder="Username" autocomplete="off" />
+          <input class="input" v-model="form.display" placeholder="Display name (optional)" autocomplete="off" />
           <input
             class="input"
             v-model="form.password"
             type="password"
-            :placeholder="form.type === 'guest' ? 'Hasło (niepotrzebne dla gościa)' : 'Hasło'"
+            :placeholder="form.type === 'guest' ? 'Password (not needed for guest)' : 'Password'"
             :disabled="form.type === 'guest'"
             autocomplete="new-password"
           />
           <label class="field">
-            <span class="lbl">Typ konta</span>
+            <span class="lbl">Account type</span>
             <select class="select" v-model="form.type">
-              <option value="user">Użytkownik</option>
+              <option value="user">User</option>
               <option value="admin">Administrator</option>
-              <option value="guest">Gość (tylko oglądanie)</option>
+              <option value="guest">Guest (view only)</option>
             </select>
           </label>
 
           <div class="access" v-if="form.type !== 'admin'">
-            <span class="lbl">Dostęp do bibliotek</span>
+            <span class="lbl">Library access</span>
             <label class="check">
               <input type="radio" value="all" v-model="form.scope" />
-              <span>Wszystkie biblioteki</span>
+              <span>All libraries</span>
             </label>
             <label class="check">
               <input type="radio" value="selected" v-model="form.scope" />
-              <span>Wybrane biblioteki</span>
+              <span>Selected libraries</span>
             </label>
             <div class="lib-list" v-if="form.scope === 'selected'">
               <label v-for="l in libraries" :key="l.id" class="check">
                 <input type="checkbox" :value="l.id" v-model="form.library_ids" />
                 <span>{{ l.name || l.path }}</span>
               </label>
-              <p v-if="!libraries.length" class="muted">Brak bibliotek.</p>
+              <p v-if="!libraries.length" class="muted">No libraries.</p>
             </div>
           </div>
 
           <button class="btn primary" :disabled="creating" type="submit">
-            {{ creating ? '⏳ Tworzę...' : '＋ Utwórz użytkownika' }}
+            {{ creating ? '⏳ Creating...' : '＋ Create user' }}
           </button>
         </form>
         <p v-if="message" :class="ok ? 'chip ok' : 'error'">{{ message }}</p>
       </template>
-      <p v-else class="muted">Tylko administrator może zarządzać użytkownikami.</p>
+      <p v-else class="muted">Only administrators can manage users.</p>
     </div>
 
     <div v-if="editing" class="modal-backdrop" @click.self="closeEdit">
       <div class="modal panel">
         <div class="modal-head">
-          <h3>Edytuj: {{ editing.username }}</h3>
+          <h3>Edit: {{ editing.username }}</h3>
           <button class="icon-btn" @click="closeEdit">✕</button>
         </div>
         <label class="field">
-          <span class="lbl">Nazwa wyświetlana</span>
+          <span class="lbl">Display name</span>
           <input class="input" v-model="editForm.display_name" />
         </label>
         <label class="field">
-          <span class="lbl">Nowe hasło (pozostaw puste, aby nie zmieniać)</span>
+          <span class="lbl">New password (leave empty to not change)</span>
           <input
             class="input"
             v-model="editForm.password"
             type="password"
             :disabled="editForm.type === 'guest'"
-            :placeholder="editForm.type === 'guest' ? 'Niepotrzebne dla gościa' : ''"
+            :placeholder="editForm.type === 'guest' ? 'Not needed for guest' : ''"
             autocomplete="new-password"
           />
         </label>
         <label class="field">
-          <span class="lbl">Typ konta</span>
+          <span class="lbl">Account type</span>
           <select class="select" v-model="editForm.type">
-            <option value="user">Użytkownik</option>
+            <option value="user">User</option>
             <option value="admin">Administrator</option>
-            <option value="guest">Gość (tylko oglądanie)</option>
+            <option value="guest">Guest (view only)</option>
           </select>
         </label>
 
         <div class="access" v-if="editForm.type !== 'admin'">
-          <span class="lbl">Dostęp do bibliotek</span>
+          <span class="lbl">Library access</span>
           <label class="check">
             <input type="radio" value="all" v-model="editForm.scope" />
-            <span>Wszystkie biblioteki</span>
+              <span>All libraries</span>
           </label>
           <label class="check">
             <input type="radio" value="selected" v-model="editForm.scope" />
-            <span>Wybrane biblioteki</span>
+              <span>Selected libraries</span>
           </label>
           <div class="lib-list" v-if="editForm.scope === 'selected'">
             <label v-for="l in libraries" :key="l.id" class="check">
               <input type="checkbox" :value="l.id" v-model="editForm.library_ids" />
               <span>{{ l.name || l.path }}</span>
             </label>
-            <p v-if="!libraries.length" class="muted">Brak bibliotek.</p>
+              <p v-if="!libraries.length" class="muted">No libraries.</p>
           </div>
         </div>
 
         <p v-if="editMsg" :class="editOk ? 'chip ok' : 'error'">{{ editMsg }}</p>
         <div class="modal-actions">
-          <button class="btn" @click="closeEdit">Anuluj</button>
+          <button class="btn" @click="closeEdit">Cancel</button>
           <button class="btn primary" :disabled="saving" @click="saveEdit">
-            {{ saving ? '⏳ Zapisuję...' : 'Zapisz' }}
+            {{ saving ? '⏳ Saving...' : 'Save' }}
           </button>
         </div>
       </div>
@@ -186,7 +186,7 @@ const form = reactive({
 })
 
 function acctLabel(u) {
-  return u.is_admin ? 'admin' : u.is_guest ? 'gość' : 'użytkownik'
+  return u.is_admin ? 'admin' : u.is_guest ? 'guest' : 'user'
 }
 function acctClass(u) {
   return u.is_admin ? 'admin' : u.is_guest ? 'guest' : 'user'
@@ -218,7 +218,7 @@ function scopeToRestricted(scope) {
 async function createUser() {
   message.value = ''
   if (!form.username.trim() || (form.type !== 'guest' && !form.password)) {
-    message.value = form.type === 'guest' ? 'Podaj nazwę użytkownika.' : 'Podaj nazwę użytkownika i hasło.'
+    message.value = form.type === 'guest' ? 'Enter a username.' : 'Enter a username and password.'
     ok.value = false
     return
   }
@@ -233,7 +233,7 @@ async function createUser() {
       restricted: form.type !== 'admin' && scopeToRestricted(form.scope),
       library_ids: form.scope === 'selected' ? form.library_ids : []
     })
-    message.value = `Utworzono użytkownika „${form.username.trim()}”.`
+    message.value = `User "${form.username.trim()}" created.`
     ok.value = true
     form.username = ''
     form.password = ''
@@ -244,7 +244,7 @@ async function createUser() {
     await load()
   } catch (e) {
     const err = e?.response?.data?.err
-    message.value = err === 'username_exists' ? 'Taka nazwa użytkownika już istnieje.' : 'Nie udało się utworzyć użytkownika.'
+    message.value = err === 'username_exists' ? 'A user with that name already exists.' : 'Failed to create user.'
     ok.value = false
   } finally {
     creating.value = false
@@ -280,17 +280,17 @@ async function saveEdit() {
       library_ids: editForm.scope === 'selected' ? editForm.library_ids : []
     })
     editOk.value = true
-    editMsg.value = 'Zapisano zmiany.'
+    editMsg.value = 'Changes saved.'
     await load()
     setTimeout(closeEdit, 600)
   } catch (e) {
     const err = e?.response?.data?.err
     editMsg.value =
       err === 'cannot_demote_self'
-        ? 'Nie można odebrać sobie uprawnień administratora.'
+        ? 'Cannot remove your own admin privileges.'
         : err === 'last_admin'
-          ? 'Nie można odebrać uprawnień ostatniemu administratorowi.'
-          : 'Nie udało się zapisać zmian.'
+          ? 'Cannot remove privileges from the last administrator.'
+          : 'Failed to save changes.'
     editOk.value = false
   } finally {
     saving.value = false
@@ -298,7 +298,7 @@ async function saveEdit() {
 }
 
 async function removeUser(u) {
-  if (!confirm(`Usunąć użytkownika „${u.username}”?`)) return
+  if (!confirm(`Delete user "${u.username}"?`)) return
   message.value = ''
   try {
     await axios.delete(API + '/users/' + u.id)
@@ -307,10 +307,10 @@ async function removeUser(u) {
     const err = e?.response?.data?.err
     message.value =
       err === 'cannot_delete_self'
-        ? 'Nie można usunąć własnego konta.'
+        ? 'Cannot delete your own account.'
         : err === 'last_admin'
-          ? 'Nie można usunąć ostatniego administratora.'
-          : 'Nie udało się usunąć użytkownika.'
+          ? 'Cannot delete the last administrator.'
+          : 'Failed to delete user.'
     ok.value = false
   }
 }

@@ -5,17 +5,17 @@
         <span class="logo">▶</span>
         <span>FlyCast</span>
       </div>
-      <p class="hint">Pierwsza konfiguracja — utwórz konto administratora.</p>
+      <p class="hint">Initial setup — create an administrator account.</p>
       <form @submit.prevent="submit">
         <div class="field">
-          <label>Login</label>
+          <label>Username</label>
           <input class="input" v-model="username" required />
         </div>
         <div class="field">
-          <label>Hasło</label>
+          <label>Password</label>
           <input class="input" v-model="password" type="password" required />
         </div>
-        <button class="btn primary" type="submit" style="justify-content:center">Utwórz konto</button>
+        <button class="btn primary" type="submit" style="justify-content:center">Create Account</button>
         <p v-if="error" class="error">{{ error }}</p>
       </form>
     </div>
@@ -39,7 +39,7 @@ async function submit() {
     await auth.initAdmin(username.value, password.value)
     router.push({ name: 'home' })
   } catch (e) {
-    error.value = 'Nie udało się utworzyć konta'
+    error.value = 'Failed to create account'
   }
 }
 </script>

@@ -1,23 +1,23 @@
 <template>
   <main class="page">
     <div class="crumbs">
-      <router-link to="/albums">Albumy</router-link>
+      <router-link to="/albums">Albums</router-link>
       <span class="sep">/</span>
       <span>{{ album.name }}</span>
       <div class="spacer"></div>
-      <button class="btn ghost danger" @click="removeAlbum">🗑️ Usuń album</button>
+      <button class="btn ghost danger" @click="removeAlbum">🗑️ Delete album</button>
     </div>
 
     <div class="grid" v-if="album.items && album.items.length">
       <div v-for="item in album.items" :key="item.id" class="album-item">
         <MediaCard :item="item" />
-        <button class="item-del" title="Usuń z albumu" @click.stop="removeItem(item)">✕</button>
+        <button class="item-del" title="Remove from album" @click.stop="removeItem(item)">✕</button>
       </div>
     </div>
 
     <div v-else class="empty">
       <div class="big">🎞️</div>
-      <div>Ten album jest pusty.</div>
+      <div>This album is empty.</div>
     </div>
   </main>
 </template>
@@ -38,12 +38,12 @@ async function load() {
   album.value = res.data
 }
 async function removeAlbum() {
-  if (!confirm(`Usunąć album „${album.value.name}”?`)) return
+  if (!confirm(`Delete album "${album.value.name}"?`)) return
   try {
     await axios.delete(API + '/albums/' + route.params.id)
     router.push({ name: 'albums' })
   } catch (e) {
-    alert('Nie udało się usunąć albumu')
+    alert('Failed to delete album')
   }
 }
 async function removeItem(item) {
@@ -51,7 +51,7 @@ async function removeItem(item) {
     await axios.post(API + '/albums/' + route.params.id + '/remove', { video_id: item.id })
     await load()
   } catch (e) {
-    alert('Nie udało się usunąć pozycji')
+    alert('Failed to remove item')
   }
 }
 onMounted(load)

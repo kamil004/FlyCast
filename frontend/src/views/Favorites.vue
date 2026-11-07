@@ -1,10 +1,10 @@
 <template>
   <main class="page">
     <div class="crumbs">
-      <span>Ulubione</span>
+      <span>Favorites</span>
     </div>
 
-    <div v-if="loading" class="loading">Ładowanie...</div>
+    <div v-if="loading" class="loading">Loading...</div>
 
     <div v-else-if="visible.length" class="grid">
       <MediaCard v-for="v in visible" :key="v.id" :item="v" />
@@ -12,7 +12,7 @@
 
     <div v-else class="empty">
       <div class="big">⭐</div>
-      <div>Brak ulubionych. Dodaj gwiazdką na miniaturce.</div>
+      <div>No favorites yet. Add with the star on a thumbnail.</div>
     </div>
   </main>
 </template>

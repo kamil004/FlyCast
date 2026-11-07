@@ -1,6 +1,6 @@
 <template>
   <main class="page">
-    <div v-if="loading" class="loading">Ładowanie...</div>
+    <div v-if="loading" class="loading">Loading...</div>
 
     <template v-else-if="video">
       <div class="detail-head">
@@ -17,19 +17,19 @@
               <span v-if="video.year">{{ video.year }}</span>
               <span v-if="video.duration">{{ fmt(video.duration) }}</span>
               <span v-if="video.size">{{ size(video.size) }}</span>
-              <span v-if="video.metadata_source">źródło: {{ video.metadata_source }}</span>
+              <span v-if="video.metadata_source">source: {{ video.metadata_source }}</span>
             </div>
             <div class="actions">
               <router-link class="btn primary" :to="{ name: 'player', params: { id: video.id } }">
-                ▶ Odtwórz
+                ▶ Play
               </router-link>
               <button
                 class="btn"
                 :disabled="!hasProgress"
-                :title="hasProgress ? 'Wznów od miejsca, w którym skończyłeś' : 'Brak zapisanego postępu'"
+                :title="hasProgress ? 'Resume from where you left off' : 'No saved progress'"
                 @click="resume"
               >
-                ⏵ Wznów
+                ⏵ Resume
               </button>
               <template v-if="!auth.isGuest">
                 <select v-model="metaSource" class="tb-select" :disabled="refreshing">
@@ -37,21 +37,21 @@
                   <option value="filmweb">Filmweb</option>
                 </select>
                 <button class="btn" :disabled="refreshing" @click="refreshMetadata">
-                  {{ refreshing ? '⏳ Szukam...' : '🔎 Pobierz metadane' }}
+                  {{ refreshing ? '⏳ Searching...' : '🔎 Download metadata' }}
                 </button>
-                <button class="btn" @click="startEdit">✏️ Edytuj</button>
+                <button class="btn" @click="startEdit">✏️ Edit</button>
                 <button v-if="isAdmin" class="btn danger" :disabled="deleting" @click="deleteVideo">
-                  {{ deleting ? '⏳ Usuwam...' : '🗑️ Usuń' }}
+                  {{ deleting ? '⏳ Deleting...' : '🗑️ Delete' }}
                 </button>
                 <button
                   v-if="isAdmin"
                   class="btn"
                   style="margin-left:24px"
                   :disabled="converting"
-                  title="Przekoduj plik do zgodnego formatu MP4 (H.264 + AAC)"
+                  title="Convert file to compatible MP4 format (H.264 + AAC)"
                   @click="convertVideo"
                 >
-                  {{ converting ? `⏳ Konwertuję... ${Math.round(convertPct)}%` : '🎬 Konwertuj na mp4' }}
+                  {{ converting ? `⏳ Converting... ${Math.round(convertPct)}%` : '🎬 Convert to mp4' }}
                 </button>
               </template>
             </div>
@@ -61,36 +61,36 @@
 
       <div class="detail-body">
         <div class="chips">
-          <span class="chip">{{ video.container || 'nieznany' }}</span>
+          <span class="chip">{{ video.container || 'unknown' }}</span>
           <span class="chip" v-if="video.imdb_id">IMDB: {{ video.imdb_id }}</span>
           <span class="chip" v-if="video.tmdb_id">TMDB: {{ video.tmdb_id }}</span>
         </div>
 
         <div v-if="video.overview" class="overview">{{ video.overview }}</div>
         <p v-else class="muted">
-          <template v-if="auth.isGuest">Brak opisu.</template>
-          <template v-else>Brak opisu. Użyj „Pobierz metadane”, aby pobrać informacje z IMDb lub Filmweb.</template>
+          <template v-if="auth.isGuest">No description.</template>
+          <template v-else>No description. Use "Download metadata" to get info from IMDb or Filmweb.</template>
         </p>
 
         <div class="section">
-          <h3>Ścieżka pliku</h3>
+          <h3>File path</h3>
           <p class="muted" style="word-break:break-all">{{ video.path }}</p>
         </div>
 
         <p v-if="message" :class="ok ? 'chip' : 'error'">{{ message }}</p>
 
         <form v-if="editing" class="edit-form" @submit.prevent="saveEdit">
-          <h3>Edytuj metadane</h3>
+          <h3>Edit metadata</h3>
           <div class="ef-row">
-            <label>Tytuł</label>
+            <label>Title</label>
             <input v-model="form.title" class="input" required />
           </div>
           <div class="ef-row">
-            <label>Rok</label>
+            <label>Year</label>
             <input v-model.number="form.year" class="input" type="number" min="0" max="2999" />
           </div>
           <div class="ef-row">
-            <label>Opis</label>
+            <label>Description</label>
             <textarea v-model="form.overview" class="input" rows="5"></textarea>
           </div>
           <div class="ef-row">
@@ -100,7 +100,7 @@
               <button
                 class="btn" type="button" :disabled="fetchingId"
                 @click="fetchById"
-              >{{ fetchingId ? '...' : '⬇ Wg ID' }}</button>
+              >{{ fetchingId ? '...' : '⬇ By ID' }}</button>
             </div>
           </div>
           <div class="ef-row">
@@ -108,15 +108,15 @@
             <input v-model="form.tmdb_id" class="input" placeholder="np. 280" />
           </div>
           <div class="ef-row">
-            <label>URL okładki (opcjonalnie)</label>
+            <label>Cover URL (optional)</label>
             <input v-model="form.poster_url" class="input" placeholder="https://..." />
-            <p class="muted small">Obrazek zostanie pobrany i zapisany jako okładka.</p>
+            <p class="muted small">Image will be downloaded and saved as cover.</p>
           </div>
           <div class="ef-actions">
             <button class="btn primary" type="submit" :disabled="saving">
-              {{ saving ? 'Zapisuję...' : '💾 Zapisz' }}
+              {{ saving ? 'Saving...' : '💾 Save' }}
             </button>
-            <button class="btn" type="button" @click="editing = false">Anuluj</button>
+            <button class="btn" type="button" @click="editing = false">Cancel</button>
           </div>
         </form>
       </div>
@@ -124,7 +124,7 @@
 
     <div v-else class="empty">
       <div class="big">🚫</div>
-      <div>Nie znaleziono filmu.</div>
+      <div>Movie not found.</div>
     </div>
   </main>
 </template>
@@ -192,14 +192,14 @@ async function load() {
   }
 }
 
-// "Wznów" is only meaningful when there is a saved position that is neither at
+// "Resume" is only meaningful when there is a saved position that is neither at
 // the very start nor effectively at the end of the clip.
 const hasProgress = computed(() => {
   const pos = Number(progress.value.position) || 0
   const dur = Number(progress.value.duration) || 0
   if (pos <= 10) return false
   // Treat the clip as finished once it is within the last ~5% (or the last 30s
-  // of long movies) so "Wznów" greys out for completed titles.
+  // of long movies) so "Resume" greys out for completed titles.
   if (dur > 0 && pos >= dur - Math.min(30, dur * 0.05)) return false
   return true
 })
@@ -211,7 +211,7 @@ function resume() {
 
 async function deleteVideo() {
   const name = video.value.title || video.value.filename
-  if (!confirm(`Usunąć plik „${name}”? Tej operacji nie można cofnąć.`)) return
+  if (!confirm(`Delete file "${name}"? This action cannot be undone.`)) return
   deleting.value = true
   try {
     await axios.delete(`/api/videos/${video.value.id}`)
@@ -220,7 +220,7 @@ async function deleteVideo() {
     if (back) router.back()
     else router.push({ name: 'library' })
   } catch (e) {
-    message.value = 'Nie udało się usunąć pliku.'
+    message.value = 'Failed to delete file.'
     ok.value = false
     deleting.value = false
   }
@@ -236,7 +236,7 @@ async function refreshMetadata() {
     })
     const results = search.data.results || []
     if (!results.length) {
-      message.value = `Brak wyników (${metaSource.value}).`
+      message.value = `No results (${metaSource.value}).`
       ok.value = false
       return
     }
@@ -251,12 +251,12 @@ async function refreshMetadata() {
       backdrop_path: r.backdrop_path || '',
       source: r.source || metaSource.value
     })
-    message.value = 'Zaktualizowano metadane.'
+    message.value = 'Metadata updated.'
     ok.value = true
     bumpThumbs()
     await load()
   } catch (e) {
-    message.value = 'Nie udało się pobrać metadanych.'
+    message.value = 'Failed to download metadata.'
     ok.value = false
   } finally {
     refreshing.value = false
@@ -280,7 +280,7 @@ function startEdit() {
 async function fetchById() {
   const id = (form.value.imdb_id || '').trim()
   if (!id) {
-    message.value = 'Podaj IMDb ID (np. tt0103064).'
+    message.value = 'Enter IMDb ID (e.g. tt0103064).'
     ok.value = false
     return
   }
@@ -290,7 +290,7 @@ async function fetchById() {
     const res = await axios.get('/api/metadata/search', { params: { imdb: id } })
     const m = (res.data.results || [])[0]
     if (!m) {
-      message.value = 'Nie znaleziono metadanych dla podanego ID.'
+      message.value = 'No metadata found for the given ID.'
       ok.value = false
       return
     }
@@ -300,10 +300,10 @@ async function fetchById() {
     form.value.imdb_id = m.imdb_id || id
     if (m.tmdb_id) form.value.tmdb_id = m.tmdb_id
     if (m.poster_path) form.value.poster_url = m.poster_path
-    message.value = 'Dane pobrane — sprawdź i zapisz.'
+    message.value = 'Data downloaded — review and save.'
     ok.value = true
   } catch (e) {
-    message.value = 'Nie udało się pobrać danych.'
+    message.value = 'Failed to download data.'
     ok.value = false
   } finally {
     fetchingId.value = false
@@ -312,7 +312,7 @@ async function fetchById() {
 
 async function saveEdit() {
   if (!form.value.title.trim()) {
-    message.value = 'Tytuł jest wymagany.'
+    message.value = 'Title is required.'
     ok.value = false
     return
   }
@@ -326,15 +326,15 @@ async function saveEdit() {
       tmdb_id: form.value.tmdb_id,
       poster_url: form.value.poster_url
     })
-    message.value = 'Zapisano zmiany.'
+    message.value = 'Changes saved.'
     ok.value = true
     editing.value = false
     bumpThumbs()
     await load()
   } catch (e) {
     message.value = e.response?.data?.err === 'poster_download_failed'
-      ? 'Nie udało się pobrać okładki z podanego adresu.'
-      : 'Nie udało się zapisać zmian.'
+      ? 'Failed to download cover from the provided URL.'
+      : 'Failed to save changes.'
     ok.value = false
   } finally {
     saving.value = false
@@ -344,7 +344,7 @@ async function saveEdit() {
 function fmt(s) {
   const h = Math.floor(s / 3600)
   const m = Math.floor((s % 3600) / 60)
-  return h > 0 ? `${h}g ${m}m` : `${m} min`
+  return h > 0 ? `${h}h ${m}m` : `${m} min`
 }
 function size(b) {
   if (!b) return ''
@@ -372,16 +372,16 @@ async function convertVideo() {
     await axios.post(`/api/videos/${video.value.id}/convert`)
   } catch (e) {
     if (e.response?.status === 409) {
-      message.value = 'Inna konwersja jest już w toku. Poczekaj, aż się zakończy.'
+      message.value = 'Another conversion is already in progress. Wait for it to finish.'
     } else {
-      message.value = 'Nie udało się rozpocząć konwersji.'
+      message.value = 'Failed to start conversion.'
     }
     ok.value = false
     return
   }
   converting.value = true
   convertPct.value = 0
-  message.value = 'Konwertuję do MP4 w tle. Możesz opuścić tę stronę — postęp pokaże się po powrocie.'
+  message.value = 'Converting to MP4 in the background. You can leave this page — progress will show when you return.'
   ok.value = true
   startConvertPoll()
 }
@@ -403,11 +403,11 @@ async function pollConvert() {
     stopConvertPoll()
     converting.value = false
     if (job.error) {
-      message.value = 'Konwersja nie udała się: ' + job.error
+      message.value = 'Conversion failed: ' + job.error
       ok.value = false
     } else {
       convertPct.value = 100
-      message.value = 'Skonwertowano do MP4. Nowy plik pojawi się w bibliotece po przeskanowaniu.'
+      message.value = 'Converted to MP4. New file will appear in library after scanning.'
       ok.value = true
     }
   } catch (e) { /* keep polling */ }
