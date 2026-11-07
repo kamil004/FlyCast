@@ -77,6 +77,7 @@ import { useAuthStore } from '@/stores/auth.js'
 import { t } from '@/i18n'
 const auth = useAuthStore()
 const route = useRoute()
+const API = '/api'
 const router = useRouter()
 const videoRef = ref(null)
 const wrapRef = ref(null)
