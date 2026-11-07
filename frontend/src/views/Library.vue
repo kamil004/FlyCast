@@ -1,7 +1,7 @@
 <template>
   <main class="page">
     <div class="crumbs">
-      <router-link :to="{ name: 'library' }">Library</router-link>
+      <router-link :to="{ name: 'library' }">Biblioteka</router-link>
       <template v-for="(cr, i) in crumbs" :key="i">
         <span class="sep">/</span>
         <router-link v-if="i < crumbs.length - 1" :to="{ name: 'library', query: cr.q }">
@@ -11,29 +11,29 @@
       </template>
       <template v-if="searchMode">
         <span class="sep">/</span>
-        <span>Results: "{{ q }}"</span>
+        <span>Wyniki: „{{ q }}”</span>
       </template>
       <template v-if="allMode">
         <span class="sep">/</span>
-        <span>All files</span>
+        <span>Wszystkie pliki</span>
       </template>
     </div>
 
-      <div v-if="loading" class="loading">Loading...</div>
+    <div v-if="loading" class="loading">Ładowanie...</div>
 
     <template v-else>
       <div v-if="folders.length || videos.length" class="lib-toolbar">
         <div class="tb-group">
-          <span class="tb-label">Sort:</span>
+          <span class="tb-label">Sortuj:</span>
           <select v-model="sortBy" class="tb-select" @change="onSortChange">
-            <option value="name">Name</option>
-            <option value="date">Date added</option>
-            <option value="filedate">File date</option>
-            <option value="size">File size</option>
+            <option value="name">Nazwa</option>
+            <option value="date">Data dodania</option>
+            <option value="filedate">Data pliku</option>
+            <option value="size">Rozmiar pliku</option>
           </select>
           <button
             class="tb-btn"
-            :title="sortDir === 'asc' ? 'Ascending' : 'Descending'"
+            :title="sortDir === 'asc' ? 'Rosnąco' : 'Malejąco'"
             @click="sortDir = sortDir === 'asc' ? 'desc' : 'asc'"
           >{{ sortDir === 'asc' ? '↑' : '↓' }}</button>
 
@@ -41,18 +41,18 @@
             <button
               class="tb-btn meta"
               :disabled="metaJob.running"
-              :title="metaJob.running ? 'Downloading metadata...' : 'Download metadata for this folder'"
+              :title="metaJob.running ? 'Pobieranie metadanych w toku' : 'Pobierz metadane dla tego katalogu'"
               @click="fetchLibraryMetadata"
             >
-              <span>⬇ Download metadata</span>
+              <span>⬇ Pobierz metadane</span>
             </button>
-            <select v-model="metaSource" class="tb-select" :disabled="metaJob.running" title="Source">
+            <select v-model="metaSource" class="tb-select" :disabled="metaJob.running" title="Źródło">
               <option value="imdb">IMDb</option>
               <option value="filmweb">Filmweb</option>
             </select>
             <span v-if="metaJob.running" class="tb-label meta-progress">
               {{ metaJob.done }}/{{ metaJob.total }}
-              <button class="meta-cancel" title="Cancel" @click="cancelMetadata">✕</button>
+              <button class="meta-cancel" title="Przerwij" @click="cancelMetadata">✕</button>
             </span>
             <span v-else-if="metaNotice" class="tb-label meta-progress">{{ metaNotice }}</span>
           </div>
@@ -60,15 +60,15 @@
         <div class="tb-group">
           <button
             class="tb-btn" :class="{ active: viewMode === 'grid' }"
-            title="Thumbnails" @click="viewMode = 'grid'"
+            title="Miniaturki" @click="viewMode = 'grid'"
           >▦</button>
           <button
             class="tb-btn" :class="{ active: viewMode === 'large' }"
-            title="Large thumbnails" @click="viewMode = 'large'"
+            title="Duże miniaturki" @click="viewMode = 'large'"
           >▣</button>
           <button
             class="tb-btn" :class="{ active: viewMode === 'list' }"
-            title="List" @click="viewMode = 'list'"
+            title="Lista" @click="viewMode = 'list'"
           >☰</button>
         </div>
       </div>
@@ -83,13 +83,13 @@
           <LibThumb :thumbs="f.thumbs" :poster="isPosterLib" />
           <div class="meta">
             <div class="n">{{ f.name }}</div>
-            <div class="c">{{ f.count || 0 }} files</div>
+            <div class="c">{{ f.count || 0 }} plików</div>
             <div class="c" v-if="fmtSize(f.size)">{{ fmtSize(f.size) }}</div>
           </div>
           <button
             v-if="isAdmin"
             class="add-lib"
-            title="Add this folder as a library"
+            title="Dodaj ten folder jako bibliotekę"
             @click.stop="addAsLibrary(f)"
             style="right:8px;width:20px"
           >＋</button>
@@ -102,8 +102,8 @@
 
       <div v-if="!folders.length && !videos.length" class="empty">
         <div class="big">🔍</div>
-        <div v-if="searchMode">No results for "{{ q }}".</div>
-        <div v-else>No media in this folder.</div>
+        <div v-if="searchMode">Brak wyników dla „{{ q }}”.</div>
+        <div v-else>Brak mediów w tym katalogu.</div>
       </div>
     </template>
   </main>
@@ -224,8 +224,8 @@ async function fetchLibraryMetadata() {
     pollMetaJob()
   } catch (e) {
     metaNotice.value = e.response?.data?.err === 'busy'
-      ? 'Download already in progress.'
-      : 'Failed to start.'
+      ? 'Pobieranie już trwa.'
+      : 'Nie udało się rozpocząć.'
   }
 }
 
@@ -239,7 +239,7 @@ function pollMetaJob() {
         pollMetaJob()
       } else {
         bumpThumbs()
-        metaNotice.value = `Done: ${res.data.updated} updated, ${res.data.failed} unchanged.`
+        metaNotice.value = `Gotowe: ${res.data.updated} zaktualizowano, ${res.data.failed} bez zmian.`
         setTimeout(() => (metaNotice.value = ''), 8000)
         await load()
       }

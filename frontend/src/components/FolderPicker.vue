@@ -2,12 +2,12 @@
   <div v-if="open" class="modal-backdrop" @click.self="$emit('close')">
     <div class="modal">
       <div class="modal-head">
-        <h3>Select folder</h3>
+        <h3>Wybierz folder</h3>
         <button class="btn ghost" @click="$emit('close')">✕</button>
       </div>
 
       <div class="crumbs" style="margin-bottom:12px">
-        <a href="#" @click.prevent="goTo('')">Roots</a>
+        <a href="#" @click.prevent="goTo('')">Korzenie</a>
         <template v-for="(seg, i) in segments" :key="i">
           <span class="sep">/</span>
           <a href="#" @click.prevent="goTo(seg.path)">{{ seg.name }}</a>
@@ -15,14 +15,14 @@
       </div>
 
       <div class="picker-list">
-        <div v-if="loading" class="loading">Loading...</div>
+        <div v-if="loading" class="loading">Ładowanie...</div>
         <template v-else>
           <div v-if="parent !== null" class="picker-row" @click="goTo(parent)">
             <span class="ico">↩</span>
             <span>..</span>
           </div>
           <div v-if="!dirs.length && !parent" class="muted" style="padding:14px">
-            No available folders (allowed: /share, /volume1-4, /mnt).
+            Brak dostępnych katalogów (dozwolone: /share, /volume1-4, /mnt).
           </div>
           <div
             v-for="d in dirs"
@@ -39,8 +39,8 @@
       <div class="modal-foot">
         <span class="muted" style="overflow:hidden;text-overflow:ellipsis">{{ current || '—' }}</span>
         <div class="spacer"></div>
-        <button class="btn" @click="$emit('close')">Cancel</button>
-        <button class="btn primary" :disabled="!current" @click="choose">Select this folder</button>
+        <button class="btn" @click="$emit('close')">Anuluj</button>
+        <button class="btn primary" :disabled="!current" @click="choose">Wybierz ten folder</button>
       </div>
     </div>
   </div>

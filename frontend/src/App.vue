@@ -7,20 +7,20 @@
     <button
       v-if="!sidebarOpen"
       class="sidebar-tab"
-      title="Show menu"
+      title="Pokaż menu"
       @click="toggleSidebar"
     >›</button>
     <div class="content">
       <header class="topbar">
         <span class="page-title">{{ pageTitle }}</span>
-        <button v-if="showBack" class="back-btn" title="Back" @click="goBack">← Back</button>
+        <button v-if="showBack" class="back-btn" title="Wstecz" @click="goBack">← Wstecz</button>
         <div class="topbar-right">
           <span v-if="appVersion" class="app-ver" title="Wersja aplikacji">v{{ appVersion }}</span>
           <div class="search">
             <span class="ico">🔎</span>
             <input
               v-model="query"
-              placeholder="Search movies..."
+              placeholder="Szukaj filmów..."
               @keyup.enter="doSearch"
             />
           </div>
@@ -78,14 +78,15 @@ watch(
 )
 
 const titles = {
-  home: 'Home',
-  library: 'Library',
-  albums: 'Albums',
+  home: 'Strona główna',
+  library: 'Biblioteka',
+  albums: 'Albumy',
   'album-view': 'Album',
-  favorites: 'Favorites',
-  detail: 'Details',
-  player: 'Player',
-  settings: 'Settings'
+  favorites: 'Ulubione',
+  detail: 'Szczegóły',
+  player: 'Odtwarzacz',
+  settings: 'Ustawienia'
+}
 const pageTitle = computed(() => titles[route.name] || 'FlyCast')
 
 // Pages that are "deeper" than the main navigation get a back button so the

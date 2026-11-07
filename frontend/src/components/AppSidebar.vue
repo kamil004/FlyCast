@@ -5,16 +5,16 @@
         <span class="logo">▶</span>
         <span>FlyCast</span>
       </router-link>
-      <button class="collapse" title="Hide menu" @click="emit('collapse')">«</button>
+      <button class="collapse" title="Ukryj menu" @click="emit('collapse')">«</button>
     </div>
 
     <nav class="nav">
       <router-link to="/" :class="{ active: isHome }">
         <span class="ico">🏠</span>
-        <span>Home</span>
+        <span>Strona główna</span>
       </router-link>
 
-      <div class="group-label">Libraries</div>
+      <div class="group-label">Biblioteki</div>
       <router-link
         v-for="lib in libraries"
         :key="lib.id"
@@ -27,28 +27,28 @@
       </router-link>
 
       <template v-if="!auth.isGuest">
-        <div class="group-label">Collections</div>
+        <div class="group-label">Kolekcje</div>
         <router-link to="/favorites" :class="{ active: isFavorites }">
           <span class="ico">⭐</span>
-          <span>Favorites</span>
+          <span>Ulubione</span>
         </router-link>
         <router-link to="/albums" :class="{ active: isAlbums }">
           <span class="ico">🗂️</span>
-          <span>Albums</span>
+          <span>Albumy</span>
         </router-link>
       </template>
 
       <template v-if="auth.user && auth.user.is_admin">
-        <div class="group-label">Management</div>
+        <div class="group-label">Zarządzanie</div>
         <router-link to="/libraries" :class="{ active: route.name === 'libraries' }">
           <span class="ico">📚</span>
-          <span>Libraries</span>
+          <span>Biblioteki</span>
         </router-link>
       </template>
 
       <router-link to="/settings" :class="{ active: route.name === 'settings' }">
         <span class="ico">⚙️</span>
-        <span>Settings</span>
+        <span>Ustawienia</span>
       </router-link>
     </nav>
 
@@ -58,7 +58,7 @@
         <span class="name">{{ auth.user.username }}</span>
         <span class="role">{{ roleLabel }}</span>
       </div>
-      <button class="btn ghost" style="margin-left:auto" title="Logout" @click="logout">⎋</button>
+      <button class="btn ghost" style="margin-left:auto" title="Wyloguj" @click="logout">⎋</button>
     </div>
   </aside>
 </template>
@@ -82,7 +82,7 @@ function logout() {
 
 const initials = computed(() => (auth.user?.username || '?').slice(0, 2))
 const roleLabel = computed(() =>
-  auth.user?.is_admin ? 'Administrator' : auth.user?.is_guest ? 'Guest' : 'User'
+  auth.user?.is_admin ? 'Administrator' : auth.user?.is_guest ? 'Gość' : 'Użytkownik'
 )
 const isHome = computed(() => route.name === 'home')
 const isAlbums = computed(() => route.name === 'albums' || route.name === 'album-view')

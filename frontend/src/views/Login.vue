@@ -5,19 +5,19 @@
         <span class="logo">▶</span>
         <span>FlyCast</span>
       </div>
-      <p class="hint">Log in to continue.</p>
+      <p class="hint">Zaloguj się, aby kontynuować.</p>
       <form @submit.prevent="submit">
         <div class="field">
-          <label>Username</label>
+          <label>Login</label>
           <input class="input" v-model="username" autocomplete="username" required />
         </div>
         <div class="field">
-          <label>Password</label>
+          <label>Hasło</label>
           <input class="input" v-model="password" type="password" autocomplete="current-password" required />
         </div>
         <div class="btn-row">
-          <button class="btn primary" type="submit">Log in</button>
-          <button class="btn" type="button" :disabled="busy" @click="guest">Guest</button>
+          <button class="btn primary" type="submit">Zaloguj</button>
+          <button class="btn" type="button" :disabled="busy" @click="guest">Gość</button>
         </div>
         <p v-if="error" class="error">{{ error }}</p>
       </form>
@@ -43,7 +43,7 @@ async function submit() {
     await auth.login(username.value, password.value)
     router.push({ name: 'home' })
   } catch (e) {
-    error.value = 'Invalid username or password'
+    error.value = 'Nieprawidłowy login lub hasło'
   }
 }
 
@@ -57,8 +57,8 @@ async function guest() {
     const err = e?.response?.data?.err
     error.value =
       err === 'no_guest'
-        ? 'No guest account. Ask an administrator to create one.'
-        : 'Failed to log in as guest.'
+        ? 'Brak konta gościa. Poproś administratora o jego utworzenie.'
+        : 'Nie udało się zalogować jako gość.'
   } finally {
     busy.value = false
   }

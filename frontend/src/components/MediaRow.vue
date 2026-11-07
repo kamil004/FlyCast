@@ -2,7 +2,7 @@
   <section class="rail" v-if="items.length">
     <div class="rail-head">
       <h2>{{ title }}</h2>
-      <router-link v-if="more" :to="more">View all</router-link>
+      <router-link v-if="more" :to="more">Zobacz wszystkie</router-link>
     </div>
     <div class="rail-track">
       <MediaCard v-for="it in items" :key="it.id" :item="it" />

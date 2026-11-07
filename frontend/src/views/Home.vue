@@ -1,11 +1,11 @@
 <template>
   <main class="page">
-    <div v-if="loading" class="loading">Loading...</div>
+    <div v-if="loading" class="loading">Ładowanie...</div>
 
     <template v-else>
       <section class="rail" v-if="libraries.length">
         <div class="rail-head">
-          <h2>Libraries</h2>
+          <h2>Biblioteki</h2>
         </div>
         <div class="lib-grid">
           <router-link
@@ -24,13 +24,13 @@
         </div>
       </section>
 
-      <MediaRow title="Continue Watching" :items="continueItems" />
+      <MediaRow title="Kontynuuj oglądanie" :items="continueItems" />
 
       <div v-if="!libraries.length && !continueItems.length" class="empty">
         <div class="big">🎬</div>
-        <div>Library is empty.</div>
+        <div>Biblioteka jest pusta.</div>
         <div class="muted">
-          Add media directories and start scanning (set <code>FLYCAST_LIBRARY</code>).
+          Dodaj katalogi mediów i uruchom skanowanie (zmienna <code>FLYCAST_LIBRARY</code>).
         </div>
       </div>
     </template>
@@ -63,7 +63,8 @@ async function load() {
 
 function plural(n) {
   if (n === 1) return 'film'
-  return 'films'
+  return 'filmów'
+}
 
 function fmtSize(bytes) {
   let n = Number(bytes) || 0

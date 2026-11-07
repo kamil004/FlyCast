@@ -1,10 +1,10 @@
 <template>
   <main class="page">
     <section class="panel-card">
-      <h2 style="margin-bottom:14px">Albums</h2>
+      <h2 style="margin-bottom:14px">Albumy</h2>
       <div class="row">
-        <input class="input" v-model="name" placeholder="New album name" @keyup.enter="create" />
-        <button class="btn primary" @click="create">＋ Create</button>
+        <input class="input" v-model="name" placeholder="Nazwa nowego albumu" @keyup.enter="create" />
+        <button class="btn primary" @click="create">＋ Utwórz</button>
       </div>
     </section>
 
@@ -13,15 +13,15 @@
         <div class="ic">🗂️</div>
         <div class="meta">
           <div class="n">{{ a.name }}</div>
-          <div class="c">{{ a.count || 0 }} items</div>
+          <div class="c">{{ a.count || 0 }} pozycji</div>
         </div>
-        <button class="add-lib del" title="Delete album" @click.stop="remove(a)">🗑️</button>
+        <button class="add-lib del" title="Usuń album" @click.stop="remove(a)">🗑️</button>
       </div>
     </div>
 
     <div v-else class="empty">
       <div class="big">🗂️</div>
-      <div>No albums yet. Create one above.</div>
+      <div>Brak albumów. Utwórz pierwszy powyżej.</div>
     </div>
   </main>
 </template>
@@ -50,12 +50,12 @@ function open(a) {
   router.push({ name: 'album-view', params: { id: a.id } })
 }
 async function remove(a) {
-  if (!confirm(`Delete album "${a.name}"?`)) return
+  if (!confirm(`Usunąć album „${a.name}”?`)) return
   try {
     await axios.delete(API + '/albums/' + a.id)
     await load()
   } catch (e) {
-    alert('Failed to delete album')
+    alert('Nie udało się usunąć albumu')
   }
 }
 onMounted(load)
