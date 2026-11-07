@@ -2,7 +2,7 @@
   <section class="rail" v-if="items.length">
     <div class="rail-head">
       <h2>{{ title }}</h2>
-      <router-link v-if="more" :to="more">Zobacz wszystkie</router-link>
+      <router-link v-if="more" :to="more">{{ t('mediarow.view_all') }}</router-link>
     </div>
     <div class="rail-track">
       <MediaCard v-for="it in items" :key="it.id" :item="it" />
@@ -12,7 +12,7 @@
 
 <script setup>
 import MediaCard from '@/components/MediaCard.vue'
-
+import { t } from '@/i18n'
 defineProps({
   title: { type: String, required: true },
   items: { type: Array, default: () => [] },

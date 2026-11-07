@@ -3,11 +3,11 @@
     <div class="thumb">
       <img v-if="thumbSrc" :src="thumbSrc" :alt="item.title" @error="failed = true" v-show="!failed" />
       <div v-if="!thumbSrc || failed" class="ph">🎞️</div>
-      <button class="play" title="Odtwórz" @click.prevent.stop="play">▶</button>
+      <button class="play" :title="t('media.play')" @click.prevent.stop="play">▶</button>
       <button
         class="fav"
         :class="{ active: isFav }"
-        :title="isFav ? 'Usuń z ulubionych' : 'Dodaj do ulubionych'"
+        :title="isFav ? t('media.fav_off') : t('media.fav_on')"
         @click.prevent.stop="toggleFav"
       >{{ isFav ? '★' : '☆' }}</button>
       <span v-if="duration" class="dur">{{ duration }}</span>
@@ -25,7 +25,7 @@ import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { mediaUrl, thumbVersion } from '@/composables/media.js'
 import { useFavoritesStore } from '@/stores/favorites'
-
+import { t } from '@/i18n'
 const props = defineProps({
   item: { type: Object, required: true },
   list: { type: Boolean, default: false }
@@ -84,7 +84,7 @@ function fmtSize(bytes) {
 const sub = computed(() => {
   const parts = []
   if (props.item.year) parts.push(props.item.year)
-  if (props.item.progress) parts.push('Kontynuuj')
+  if (props.item.progress) parts.push(t('media.continue'))
   if (props.list) {
     const d = props.item.created_at ? fmtDate(props.item.created_at) : ''
     if (d) parts.push(d)

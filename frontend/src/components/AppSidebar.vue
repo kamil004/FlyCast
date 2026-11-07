@@ -5,16 +5,16 @@
         <span class="logo">▶</span>
         <span>FlyCast</span>
       </router-link>
-      <button class="collapse" title="Ukryj menu" @click="emit('collapse')">«</button>
+      <button class="collapse" :title="t('topbar.hide_menu')" @click="emit('collapse')">«</button>
     </div>
 
     <nav class="nav">
       <router-link to="/" :class="{ active: isHome }">
         <span class="ico">🏠</span>
-        <span>Strona główna</span>
+        <span>{{ t('sidebar.home') }}</span>
       </router-link>
 
-      <div class="group-label">Biblioteki</div>
+      <div class="group-label">{{ t('sidebar.libraries') }}</div>
       <router-link
         v-for="lib in libraries"
         :key="lib.id"
@@ -27,28 +27,28 @@
       </router-link>
 
       <template v-if="!auth.isGuest">
-        <div class="group-label">Kolekcje</div>
+        <div class="group-label">{{ t('sidebar.collections') }}</div>
         <router-link to="/favorites" :class="{ active: isFavorites }">
           <span class="ico">⭐</span>
-          <span>Ulubione</span>
+          <span>{{ t('sidebar.favorites') }}</span>
         </router-link>
         <router-link to="/albums" :class="{ active: isAlbums }">
           <span class="ico">🗂️</span>
-          <span>Albumy</span>
+          <span>{{ t('sidebar.albums') }}</span>
         </router-link>
       </template>
 
       <template v-if="auth.user && auth.user.is_admin">
-        <div class="group-label">Zarządzanie</div>
+        <div class="group-label">{{ t('sidebar.management') }}</div>
         <router-link to="/libraries" :class="{ active: route.name === 'libraries' }">
           <span class="ico">📚</span>
-          <span>Biblioteki</span>
+          <span>{{ t('sidebar.libs') }}</span>
         </router-link>
       </template>
 
       <router-link to="/settings" :class="{ active: route.name === 'settings' }">
         <span class="ico">⚙️</span>
-        <span>Ustawienia</span>
+        <span>{{ t('sidebar.settings') }}</span>
       </router-link>
     </nav>
 
@@ -58,7 +58,7 @@
         <span class="name">{{ auth.user.username }}</span>
         <span class="role">{{ roleLabel }}</span>
       </div>
-      <button class="btn ghost" style="margin-left:auto" title="Wyloguj" @click="logout">⎋</button>
+      <button class="btn ghost" style="margin-left:auto" :title="t('sidebar.logout')" @click="logout">⎋</button>
     </div>
   </aside>
 </template>
@@ -68,6 +68,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 import { useAuthStore } from '@/stores/auth'
+import { t } from '@/i18n'
 
 const auth = useAuthStore()
 const route = useRoute()
@@ -81,9 +82,11 @@ function logout() {
 }
 
 const initials = computed(() => (auth.user?.username || '?').slice(0, 2))
-const roleLabel = computed(() =>
-  auth.user?.is_admin ? 'Administrator' : auth.user?.is_guest ? 'Gość' : 'Użytkownik'
-)
+const roleLabel = computed(() => {
+  if (auth.user?.is_admin) return t('sidebar.admin')
+  if (auth.user?.is_guest) return t('sidebar.guest')
+  return t('sidebar.user')
+})
 const isHome = computed(() => route.name === 'home')
 const isAlbums = computed(() => route.name === 'albums' || route.name === 'album-view')
 const isFavorites = computed(() => route.name === 'favorites')

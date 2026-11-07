@@ -1,11 +1,11 @@
 <template>
   <main class="page">
-    <div v-if="loading" class="loading">Ładowanie...</div>
+    <div v-if="loading" class="loading">{{ t('home.loading') }}</div>
 
     <template v-else>
       <section class="rail" v-if="libraries.length">
         <div class="rail-head">
-          <h2>Biblioteki</h2>
+          <h2>{{ t('home.libraries') }}</h2>
         </div>
         <div class="lib-grid">
           <router-link
@@ -24,14 +24,12 @@
         </div>
       </section>
 
-      <MediaRow title="Kontynuuj oglądanie" :items="continueItems" />
+      <MediaRow :title="t('home.continue')" :items="continueItems" />
 
       <div v-if="!libraries.length && !continueItems.length" class="empty">
         <div class="big">🎬</div>
-        <div>Biblioteka jest pusta.</div>
-        <div class="muted">
-          Dodaj katalogi mediów i uruchom skanowanie (zmienna <code>FLYCAST_LIBRARY</code>).
-        </div>
+        <div>{{ t('home.empty') }}</div>
+        <div class="muted" v-html="t('home.empty_hint')"></div>
       </div>
     </template>
   </main>
@@ -42,6 +40,7 @@ import { onMounted, ref } from 'vue'
 import axios from 'axios'
 import MediaRow from '@/components/MediaRow.vue'
 import LibThumb from '@/components/LibThumb.vue'
+import { t } from '@/i18n'
 
 const loading = ref(true)
 const continueItems = ref([])
@@ -62,8 +61,8 @@ async function load() {
 }
 
 function plural(n) {
-  if (n === 1) return 'film'
-  return 'filmów'
+  if (n === 1) return t('home.film')
+  return t('home.films')
 }
 
 function fmtSize(bytes) {

@@ -1,12 +1,12 @@
 <template>
   <main class="page">
     <div class="panel">
-      <h2>Ustawienia</h2>
-      <p class="muted">Podstawowe informacje o FlyCast</p>
+      <h2>{{ t('settings.title') }}</h2>
+      <p class="muted">{{ t('settings.subtitle') }}</p>
       <div class="kv">
-        <span>Wersja</span>
+        <span>{{ t('settings.version') }}</span>
         <span>0.1.0</span>
-        <span>Port HTTP</span>
+        <span>{{ t('settings.http_port') }}</span>
         <span>8100</span>
         <span>Streaming</span>
         <span>Direct Play + remux + transkodowanie</span>
@@ -14,7 +14,7 @@
     </div>
 
     <div class="panel">
-      <h3>Użytkownicy</h3>
+      <h3>{{ t('settings.users') }}</h3>
       <div class="users">
         <div v-for="u in users" :key="u.id" class="user">
           <div class="wholine">
@@ -24,19 +24,18 @@
           <div class="row-right">
             <span class="tag" :class="acctClass(u)">{{ acctLabel(u) }}</span>
             <span class="tag scope" v-if="!u.is_admin">
-              {{ u.restricted ? `${(u.library_ids || []).length} bibl.` : 'wszystkie bibl.' }}
-            </span>
+              {{ u.restricted ? `${(u.library_ids || []).length} ${t('settings.libs_count')}` : t('settings.all_libs_short') }}
             <span class="tag you" v-if="u.id === me?.id">to Ty</span>
-            <button
+            <span class="tag you" v-if="u.id === me?.id">{{ t('settings.is_you') }}</span>
               v-if="isAdmin"
               class="icon-btn"
-              title="Edytuj użytkownika"
+              :title="t('settings.edit_user')"
               @click="openEdit(u)"
             >✏️</button>
             <button
               v-if="isAdmin && u.id !== me?.id"
               class="icon-btn danger"
-              title="Usuń użytkownika"
+              :title="t('settings.delete_user')"
               @click="removeUser(u)"
             >🗑️</button>
           </div>
@@ -44,109 +43,109 @@
       </div>
 
       <template v-if="isAdmin">
-        <h3 style="margin-top:8px">Dodaj użytkownika</h3>
+        <h3 style="margin-top:8px">{{ t('settings.add_user') }}</h3>
         <form class="create-form" @submit.prevent="createUser">
-          <input class="input" v-model="form.username" placeholder="Nazwa użytkownika" autocomplete="off" />
-          <input class="input" v-model="form.display" placeholder="Nazwa wyświetlana (opcjonalnie)" autocomplete="off" />
+          <input class="input" v-model="form.username" :placeholder="t('settings.username')" autocomplete="off" />
+          <input class="input" v-model="form.display" :placeholder="t('settings.display_optional')" autocomplete="off" />
           <input
             class="input"
             v-model="form.password"
             type="password"
-            :placeholder="form.type === 'guest' ? 'Hasło (niepotrzebne dla gościa)' : 'Hasło'"
+            :placeholder="form.type === 'guest' ? t('settings.password_guest') : t('settings.password')"
             :disabled="form.type === 'guest'"
             autocomplete="new-password"
           />
           <label class="field">
-            <span class="lbl">Typ konta</span>
+            <span class="lbl">{{ t('settings.account_type') }}</span>
             <select class="select" v-model="form.type">
-              <option value="user">Użytkownik</option>
-              <option value="admin">Administrator</option>
-              <option value="guest">Gość (tylko oglądanie)</option>
+              <option value="user">{{ t('settings.type_user') }}</option>
+              <option value="admin">{{ t('settings.type_admin') }}</option>
+              <option value="guest">{{ t('settings.type_guest') }}</option>
             </select>
           </label>
 
           <div class="access" v-if="form.type !== 'admin'">
-            <span class="lbl">Dostęp do bibliotek</span>
+            <span class="lbl">{{ t('settings.library_access') }}</span>
             <label class="check">
               <input type="radio" value="all" v-model="form.scope" />
-              <span>Wszystkie biblioteki</span>
+              <span>{{ t('settings.all_libs') }}</span>
             </label>
             <label class="check">
               <input type="radio" value="selected" v-model="form.scope" />
-              <span>Wybrane biblioteki</span>
+              <span>{{ t('settings.selected_libs') }}</span>
             </label>
             <div class="lib-list" v-if="form.scope === 'selected'">
               <label v-for="l in libraries" :key="l.id" class="check">
                 <input type="checkbox" :value="l.id" v-model="form.library_ids" />
                 <span>{{ l.name || l.path }}</span>
               </label>
-              <p v-if="!libraries.length" class="muted">Brak bibliotek.</p>
+              <p v-if="!libraries.length" class="muted">{{ t('settings.no_libs') }}</p>
             </div>
           </div>
 
           <button class="btn primary" :disabled="creating" type="submit">
-            {{ creating ? '⏳ Tworzę...' : '＋ Utwórz użytkownika' }}
+            {{ creating ? t('settings.creating') : t('settings.create_btn') }}
           </button>
         </form>
         <p v-if="message" :class="ok ? 'chip ok' : 'error'">{{ message }}</p>
       </template>
-      <p v-else class="muted">Tylko administrator może zarządzać użytkownikami.</p>
+      <p v-else class="muted">{{ t('settings.admin_only') }}</p>
     </div>
 
     <div v-if="editing" class="modal-backdrop" @click.self="closeEdit">
       <div class="modal panel">
         <div class="modal-head">
-          <h3>Edytuj: {{ editing.username }}</h3>
+          <h3>{{ t('settings.edit_header', { username: editing.username }) }}</h3>
           <button class="icon-btn" @click="closeEdit">✕</button>
         </div>
         <label class="field">
-          <span class="lbl">Nazwa wyświetlana</span>
+          <span class="lbl">{{ t('settings.display_name') }}</span>
           <input class="input" v-model="editForm.display_name" />
         </label>
         <label class="field">
-          <span class="lbl">Nowe hasło (pozostaw puste, aby nie zmieniać)</span>
+          <span class="lbl">{{ t('settings.new_password') }}</span>
           <input
             class="input"
             v-model="editForm.password"
             type="password"
             :disabled="editForm.type === 'guest'"
-            :placeholder="editForm.type === 'guest' ? 'Niepotrzebne dla gościa' : ''"
+            :placeholder="editForm.type === 'guest' ? t('settings.password_empty') : ''"
             autocomplete="new-password"
           />
         </label>
         <label class="field">
-          <span class="lbl">Typ konta</span>
+          <span class="lbl">{{ t('settings.account_type') }}</span>
           <select class="select" v-model="editForm.type">
-            <option value="user">Użytkownik</option>
-            <option value="admin">Administrator</option>
-            <option value="guest">Gość (tylko oglądanie)</option>
+            <option value="user">{{ t('settings.type_user') }}</option>
+            <option value="admin">{{ t('settings.type_admin') }}</option>
+            <option value="guest">{{ t('settings.type_guest') }}</option>
           </select>
         </label>
 
         <div class="access" v-if="editForm.type !== 'admin'">
-          <span class="lbl">Dostęp do bibliotek</span>
+          <span class="lbl">{{ t('settings.library_access') }}</span>
           <label class="check">
             <input type="radio" value="all" v-model="editForm.scope" />
-            <span>Wszystkie biblioteki</span>
+            <span>{{ t('settings.all_libs') }}</span>
           </label>
           <label class="check">
             <input type="radio" value="selected" v-model="editForm.scope" />
-            <span>Wybrane biblioteki</span>
+            <span>{{ t('settings.selected_libs') }}</span>
           </label>
           <div class="lib-list" v-if="editForm.scope === 'selected'">
             <label v-for="l in libraries" :key="l.id" class="check">
               <input type="checkbox" :value="l.id" v-model="editForm.library_ids" />
               <span>{{ l.name || l.path }}</span>
             </label>
-            <p v-if="!libraries.length" class="muted">Brak bibliotek.</p>
+            <p v-if="!libraries.length" class="muted">{{ t('settings.no_libs') }}</p>
           </div>
         </div>
 
         <p v-if="editMsg" :class="editOk ? 'chip ok' : 'error'">{{ editMsg }}</p>
         <div class="modal-actions">
-          <button class="btn" @click="closeEdit">Anuluj</button>
+          <button class="btn" @click="closeEdit">{{ t('detail.cancel') }}</button>
           <button class="btn primary" :disabled="saving" @click="saveEdit">
-            {{ saving ? '⏳ Zapisuję...' : 'Zapisz' }}
+            {{ saving ? t('settings.saving') : t('settings.save_btn') }}
           </button>
         </div>
       </div>
@@ -158,6 +157,7 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import axios from 'axios'
 import { useAuthStore } from '@/stores/auth.js'
+import { t } from '@/i18n'
 
 const API = '/api'
 const auth = useAuthStore()
@@ -187,8 +187,7 @@ const form = reactive({
 
 function acctLabel(u) {
   return u.is_admin ? 'admin' : u.is_guest ? 'gość' : 'użytkownik'
-}
-function acctClass(u) {
+  return u.is_admin ? t('settings.type_admin') : u.is_guest ? t('settings.type_guest') : t('settings.type_user')
   return u.is_admin ? 'admin' : u.is_guest ? 'guest' : 'user'
 }
 
@@ -218,7 +217,7 @@ function scopeToRestricted(scope) {
 async function createUser() {
   message.value = ''
   if (!form.username.trim() || (form.type !== 'guest' && !form.password)) {
-    message.value = form.type === 'guest' ? 'Podaj nazwę użytkownika.' : 'Podaj nazwę użytkownika i hasło.'
+    message.value = form.type === 'guest' ? t('settings.create_prompt_guest') : t('settings.create_prompt')
     ok.value = false
     return
   }
@@ -233,7 +232,7 @@ async function createUser() {
       restricted: form.type !== 'admin' && scopeToRestricted(form.scope),
       library_ids: form.scope === 'selected' ? form.library_ids : []
     })
-    message.value = `Utworzono użytkownika „${form.username.trim()}”.`
+    message.value = t('settings.created', { username: form.username.trim() })
     ok.value = true
     form.username = ''
     form.password = ''
@@ -244,7 +243,9 @@ async function createUser() {
     await load()
   } catch (e) {
     const err = e?.response?.data?.err
-    message.value = err === 'username_exists' ? 'Taka nazwa użytkownika już istnieje.' : 'Nie udało się utworzyć użytkownika.'
+    message.value = err === 'username_exists'
+      ? t('settings.username_exists')
+      : t('settings.create_failed')
     ok.value = false
   } finally {
     creating.value = false
@@ -280,17 +281,17 @@ async function saveEdit() {
       library_ids: editForm.scope === 'selected' ? editForm.library_ids : []
     })
     editOk.value = true
-    editMsg.value = 'Zapisano zmiany.'
+    editMsg.value = t('settings.saved')
     await load()
     setTimeout(closeEdit, 600)
   } catch (e) {
     const err = e?.response?.data?.err
     editMsg.value =
       err === 'cannot_demote_self'
-        ? 'Nie można odebrać sobie uprawnień administratora.'
+        ? t('settings.no_demote_self')
         : err === 'last_admin'
-          ? 'Nie można odebrać uprawnień ostatniemu administratorowi.'
-          : 'Nie udało się zapisać zmian.'
+          ? t('settings.no_last_admin')
+          : t('settings.save_failed')
     editOk.value = false
   } finally {
     saving.value = false
@@ -298,7 +299,7 @@ async function saveEdit() {
 }
 
 async function removeUser(u) {
-  if (!confirm(`Usunąć użytkownika „${u.username}”?`)) return
+  if (!confirm(t('settings.confirm_delete_user', { username: u.username }))) return
   message.value = ''
   try {
     await axios.delete(API + '/users/' + u.id)
@@ -307,10 +308,10 @@ async function removeUser(u) {
     const err = e?.response?.data?.err
     message.value =
       err === 'cannot_delete_self'
-        ? 'Nie można usunąć własnego konta.'
+        ? t('settings.no_delete_self')
         : err === 'last_admin'
-          ? 'Nie można usunąć ostatniego administratora.'
-          : 'Nie udało się usunąć użytkownika.'
+          ? t('settings.no_last_admin_delete')
+          : t('settings.delete_failed')
     ok.value = false
   }
 }

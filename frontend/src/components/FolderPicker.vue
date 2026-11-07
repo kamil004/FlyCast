@@ -2,12 +2,12 @@
   <div v-if="open" class="modal-backdrop" @click.self="$emit('close')">
     <div class="modal">
       <div class="modal-head">
-        <h3>Wybierz folder</h3>
+        <h3>{{ t('folderpicker.title') }}</h3>
         <button class="btn ghost" @click="$emit('close')">✕</button>
       </div>
 
       <div class="crumbs" style="margin-bottom:12px">
-        <a href="#" @click.prevent="goTo('')">Korzenie</a>
+        <a href="#" @click.prevent="goTo('')">{{ t('folderpicker.roots') }}</a>
         <template v-for="(seg, i) in segments" :key="i">
           <span class="sep">/</span>
           <a href="#" @click.prevent="goTo(seg.path)">{{ seg.name }}</a>
@@ -15,14 +15,13 @@
       </div>
 
       <div class="picker-list">
-        <div v-if="loading" class="loading">Ładowanie...</div>
+        <div v-if="loading" class="loading">{{ t('folderpicker.loading') }}</div>
         <template v-else>
           <div v-if="parent !== null" class="picker-row" @click="goTo(parent)">
             <span class="ico">↩</span>
             <span>..</span>
           </div>
-          <div v-if="!dirs.length && !parent" class="muted" style="padding:14px">
-            Brak dostępnych katalogów (dozwolone: /share, /volume1-4, /mnt).
+          <div v-if="!dirs.length && !parent" class="muted" style="padding:14px">{{ t('folderpicker.no_folders') }}</div>
           </div>
           <div
             v-for="d in dirs"
@@ -39,8 +38,8 @@
       <div class="modal-foot">
         <span class="muted" style="overflow:hidden;text-overflow:ellipsis">{{ current || '—' }}</span>
         <div class="spacer"></div>
-        <button class="btn" @click="$emit('close')">Anuluj</button>
-        <button class="btn primary" :disabled="!current" @click="choose">Wybierz ten folder</button>
+        <button class="btn" @click="$emit('close')">{{ t('folderpicker.cancel') }}</button>
+        <button class="btn primary" :disabled="!current" @click="choose">{{ t('folderpicker.select') }}</button>
       </div>
     </div>
   </div>
@@ -49,7 +48,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import axios from 'axios'
-
+import { t } from '@/i18n'
 const props = defineProps({
   open: { type: Boolean, default: false },
   start: { type: String, default: '' }

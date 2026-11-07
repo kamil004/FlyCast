@@ -1,10 +1,10 @@
 <template>
   <main class="page">
     <section class="panel-card">
-      <h2 style="margin-bottom:14px">Albumy</h2>
+      <h2 style="margin-bottom:14px">{{ t('albums.title') }}</h2>
       <div class="row">
-        <input class="input" v-model="name" placeholder="Nazwa nowego albumu" @keyup.enter="create" />
-        <button class="btn primary" @click="create">＋ Utwórz</button>
+        <input class="input" v-model="name" :placeholder="t('albums.placeholder')" @keyup.enter="create" />
+        <button class="btn primary" @click="create">{{ t('albums.create') }}</button>
       </div>
     </section>
 
@@ -13,15 +13,15 @@
         <div class="ic">🗂️</div>
         <div class="meta">
           <div class="n">{{ a.name }}</div>
-          <div class="c">{{ a.count || 0 }} pozycji</div>
+          <div class="c">{{ a.count || 0 }} {{ t('albums.items') }}</div>
         </div>
-        <button class="add-lib del" title="Usuń album" @click.stop="remove(a)">🗑️</button>
+        <button class="add-lib del" :title="t('albums.delete_btn')" @click.stop="remove(a)">🗑️</button>
       </div>
     </div>
 
     <div v-else class="empty">
       <div class="big">🗂️</div>
-      <div>Brak albumów. Utwórz pierwszy powyżej.</div>
+      <div>{{ t('albums.empty') }}</div>
     </div>
   </main>
 </template>
@@ -30,6 +30,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
+import { t } from '@/i18n'
 
 const API = '/api'
 const router = useRouter()
@@ -50,12 +51,12 @@ function open(a) {
   router.push({ name: 'album-view', params: { id: a.id } })
 }
 async function remove(a) {
-  if (!confirm(`Usunąć album „${a.name}”?`)) return
+  if (!confirm(t('albums.confirm_delete', { name: a.name }))) return
   try {
     await axios.delete(API + '/albums/' + a.id)
     await load()
   } catch (e) {
-    alert('Nie udało się usunąć albumu')
+    alert(t('albums.delete_failed'))
   }
 }
 onMounted(load)

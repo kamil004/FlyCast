@@ -2,11 +2,11 @@
   <main class="page">
     <div class="head-row">
       <div>
-        <h2>Biblioteki</h2>
-        <p class="muted">Dodawaj katalogi mediów i uruchamiaj skanowanie.</p>
+        <h2>{{ t('libraries.title') }}</h2>
+        <p class="muted">{{ t('libraries.subtitle') }}</p>
       </div>
       <button class="btn" :disabled="scanning" @click="scanAll">
-        {{ scanning ? '⏳ Skanowanie...' : '🔄 Skanuj wszystko' }}
+        {{ scanning ? t('libraries.scanning') : t('libraries.scan_all') }}
       </button>
     </div>
 
@@ -18,46 +18,46 @@
           <div class="p">{{ lib.path }}</div>
         </div>
         <span class="chip">{{ typeLabel(lib.media_type) }}</span>
-        <span class="count">{{ lib.count }} filmów</span>
-        <span v-if="!lib.exists" class="chip warn">brak dostępu</span>
+        <span class="count">{{ lib.count }} {{ t('libraries.films') }}</span>
+        <span v-if="!lib.exists" class="chip warn">{{ t('libraries.no_access') }}</span>
         <div class="actions">
-          <button class="btn ghost" :disabled="scanning" @click="scanOne(lib)" title="Skanuj">🔄</button>
-          <button class="btn ghost" :disabled="clearing === lib.id" @click="clearMetadata(lib)" title="Usuń wszystkie metadane">🧹</button>
-          <button class="btn ghost" @click="confirmRemove(lib)" title="Usuń">🗑️</button>
+          <button class="btn ghost" :disabled="scanning" @click="scanOne(lib)" :title="t('libraries.scan')">🔄</button>
+          <button class="btn ghost" :disabled="clearing === lib.id" :title="t('libraries.clear_meta')" @click="clearMetadata(lib)">🧹</button>
+          <button class="btn ghost" @click="confirmRemove(lib)" :title="t('libraries.delete')">🗑️</button>
         </div>
       </div>
     </div>
     <div v-else class="empty">
       <div class="big">📚</div>
-      <div>Brak skonfigurowanych bibliotek.</div>
+      <div>{{ t('libraries.no_configured') }}</div>
     </div>
 
     <div class="panel-card">
-      <h3 style="margin-bottom:14px">Dodaj bibliotekę</h3>
+      <h3 style="margin-bottom:14px">{{ t('libraries.add_title') }}</h3>
       <div class="form">
         <div class="field">
-          <label>Ścieżka</label>
+          <label>{{ t('libraries.path') }}</label>
           <div class="path-row">
-            <input class="input" v-model="form.path" placeholder="/share/Multimedia/Filmy" />
-            <button class="btn" @click="picker = true">📂 Przeglądaj</button>
+            <input class="input" v-model="form.path" :placeholder="t('libraries.path_placeholder')" />
+            <button class="btn" @click="picker = true">{{ t('libraries.browse') }}</button>
           </div>
         </div>
         <div class="field">
-          <label>Nazwa (opcjonalnie)</label>
-          <input class="input" v-model="form.name" placeholder="np. Filmy" />
+          <label>{{ t('libraries.name') }}</label>
+          <input class="input" v-model="form.name" :placeholder="t('libraries.name_placeholder')" />
         </div>
         <div class="field">
-          <label>Typ</label>
+          <label>{{ t('libraries.type') }}</label>
           <select class="input" v-model="form.media_type">
-            <option value="mixed">Mieszane</option>
-            <option value="movies">Filmy</option>
-            <option value="tv">Seriale</option>
-            <option value="home">Nagrania / Domowe</option>
+            <option value="mixed">{{ t('libraries.type_mixed') }}</option>
+            <option value="movies">{{ t('libraries.type_movies') }}</option>
+            <option value="tv">{{ t('libraries.type_tv') }}</option>
+            <option value="home">{{ t('libraries.type_home') }}</option>
           </select>
         </div>
         <div>
           <button class="btn primary" :disabled="adding || !form.path" @click="add">
-            {{ adding ? 'Dodaję...' : '＋ Dodaj bibliotekę' }}
+            {{ adding ? t('libraries.adding') : t('libraries.add_btn') }}
           </button>
         </div>
         <p v-if="error" class="error">{{ error }}</p>
@@ -74,6 +74,7 @@ import { onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 import FolderPicker from '@/components/FolderPicker.vue'
+import { t } from '@/i18n'
 
 const route = useRoute()
 const router = useRouter()
@@ -109,27 +110,27 @@ async function add() {
     form.path = ''
     form.name = ''
     form.media_type = 'mixed'
-    notice.value = 'Dodano bibliotekę. Skanowanie w toku...'
+    notice.value = t('libraries.added')
     await delay(1500)
     await load()
   } catch (e) {
     error.value = e.response?.data?.err === 'already_exists'
-      ? 'Ta biblioteka już istnieje.'
-      : 'Nie udało się dodać biblioteki.'
+      ? t('libraries.exists')
+      : t('libraries.add_failed')
   } finally {
     adding.value = false
   }
 }
 
 async function confirmRemove(lib) {
-  if (!confirm(`Usunąć bibliotekę „${lib.name}” i wszystkie jej filmy z bazy?`)) return
+  if (!confirm(t('libraries.confirm_delete', { name: lib.name }))) return
   await axios.delete('/api/libraries/' + lib.id)
   await load()
 }
 
 async function scanAll() {
   scanning.value = true
-  notice.value = 'Skanowanie w toku...'
+  notice.value = t('libraries.scanning_progress')
   await axios.post('/api/libraries/scan')
   await delay(2500)
   await load()
@@ -145,23 +146,23 @@ async function scanOne(lib) {
 }
 
 async function clearMetadata(lib) {
-  if (!confirm(`Usunąć wszystkie metadane (tytuły, opisy, okładki) dla biblioteki "${lib.name}"?`)) {
+  if (!confirm(t('libraries.confirm_clear_meta', { name: lib.name }))) {
     return
   }
   clearing.value = lib.id
   try {
     const res = await axios.post(`/api/libraries/${lib.id}/metadata/clear`)
-    notice.value = `Wyczyszczono metadane (${res.data.count || 0} pozycji).`
+    notice.value = t('libraries.cleared', { count: res.data.count || 0 })
     await load()
   } catch (e) {
-    notice.value = 'Nie udało się wyczyścić metadanych.'
+    notice.value = t('libraries.clear_failed')
   } finally {
     clearing.value = null
   }
 }
 
-function typeLabel(t) {
-  return { mixed: 'Mieszane', movies: 'Filmy', tv: 'Seriale', home: 'Domowe' }[t] || t
+function typeLabel(ty) {
+  return { mixed: 'libraries.type_label_mixed', movies: 'libraries.type_label_movies', tv: 'libraries.type_label_tv', home: 'libraries.type_label_home' }[ty] ? t('libraries.type_label_' + ty) : ty
 }
 function delay(ms) {
   return new Promise((r) => setTimeout(r, ms))

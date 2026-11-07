@@ -1,7 +1,7 @@
 <template>
   <main class="page">
     <div class="crumbs">
-      <router-link :to="{ name: 'library' }">Biblioteka</router-link>
+      <router-link :to="{ name: 'library' }">{{ t('library.breadcrumb') }}</router-link>
       <template v-for="(cr, i) in crumbs" :key="i">
         <span class="sep">/</span>
         <router-link v-if="i < crumbs.length - 1" :to="{ name: 'library', query: cr.q }">
@@ -11,29 +11,29 @@
       </template>
       <template v-if="searchMode">
         <span class="sep">/</span>
-        <span>Wyniki: „{{ q }}”</span>
+        <span>{{ t('library.results', { q }) }}</span>
       </template>
       <template v-if="allMode">
         <span class="sep">/</span>
-        <span>Wszystkie pliki</span>
+        <span>{{ t('library.all_files') }}</span>
       </template>
     </div>
 
-    <div v-if="loading" class="loading">Ładowanie...</div>
+    <div v-if="loading" class="loading">{{ t('library.loading') }}</div>
 
     <template v-else>
       <div v-if="folders.length || videos.length" class="lib-toolbar">
         <div class="tb-group">
-          <span class="tb-label">Sortuj:</span>
+          <span class="tb-label">{{ t('library.sort') }}</span>
           <select v-model="sortBy" class="tb-select" @change="onSortChange">
-            <option value="name">Nazwa</option>
-            <option value="date">Data dodania</option>
-            <option value="filedate">Data pliku</option>
-            <option value="size">Rozmiar pliku</option>
+            <option value="name">{{ t('library.sort_name') }}</option>
+            <option value="date">{{ t('library.sort_date') }}</option>
+            <option value="filedate">{{ t('library.sort_filedate') }}</option>
+            <option value="size">{{ t('library.sort_size') }}</option>
           </select>
           <button
             class="tb-btn"
-            :title="sortDir === 'asc' ? 'Rosnąco' : 'Malejąco'"
+            :title="sortDir === 'asc' ? t('library.ascending') : t('library.descending')"
             @click="sortDir = sortDir === 'asc' ? 'desc' : 'asc'"
           >{{ sortDir === 'asc' ? '↑' : '↓' }}</button>
 
@@ -41,18 +41,18 @@
             <button
               class="tb-btn meta"
               :disabled="metaJob.running"
-              :title="metaJob.running ? 'Pobieranie metadanych w toku' : 'Pobierz metadane dla tego katalogu'"
+              :title="metaJob.running ? t('library.meta_downloading') : t('library.meta_download')"
               @click="fetchLibraryMetadata"
             >
-              <span>⬇ Pobierz metadane</span>
+              <span>{{ t('library.meta_download_btn') }}</span>
             </button>
-            <select v-model="metaSource" class="tb-select" :disabled="metaJob.running" title="Źródło">
+            <select v-model="metaSource" class="tb-select" :disabled="metaJob.running" :title="t('library.meta_source')">
               <option value="imdb">IMDb</option>
               <option value="filmweb">Filmweb</option>
             </select>
             <span v-if="metaJob.running" class="tb-label meta-progress">
               {{ metaJob.done }}/{{ metaJob.total }}
-              <button class="meta-cancel" title="Przerwij" @click="cancelMetadata">✕</button>
+              <button class="meta-cancel" :title="t('library.meta_cancel')" @click="cancelMetadata">✕</button>
             </span>
             <span v-else-if="metaNotice" class="tb-label meta-progress">{{ metaNotice }}</span>
           </div>
@@ -60,15 +60,15 @@
         <div class="tb-group">
           <button
             class="tb-btn" :class="{ active: viewMode === 'grid' }"
-            title="Miniaturki" @click="viewMode = 'grid'"
+            :title="t('library.view_thumbs')" @click="viewMode = 'grid'"
           >▦</button>
           <button
             class="tb-btn" :class="{ active: viewMode === 'large' }"
-            title="Duże miniaturki" @click="viewMode = 'large'"
+            :title="t('library.view_large')" @click="viewMode = 'large'"
           >▣</button>
           <button
             class="tb-btn" :class="{ active: viewMode === 'list' }"
-            title="Lista" @click="viewMode = 'list'"
+            :title="t('library.view_list')" @click="viewMode = 'list'"
           >☰</button>
         </div>
       </div>
@@ -83,13 +83,13 @@
           <LibThumb :thumbs="f.thumbs" :poster="isPosterLib" />
           <div class="meta">
             <div class="n">{{ f.name }}</div>
-            <div class="c">{{ f.count || 0 }} plików</div>
+            <div class="c">{{ f.count || 0 }} {{ t('library.files') }}</div>
             <div class="c" v-if="fmtSize(f.size)">{{ fmtSize(f.size) }}</div>
           </div>
           <button
             v-if="isAdmin"
             class="add-lib"
-            title="Dodaj ten folder jako bibliotekę"
+            :title="t('library.add_as_lib')"
             @click.stop="addAsLibrary(f)"
             style="right:8px;width:20px"
           >＋</button>
@@ -102,8 +102,8 @@
 
       <div v-if="!folders.length && !videos.length" class="empty">
         <div class="big">🔍</div>
-        <div v-if="searchMode">Brak wyników dla „{{ q }}”.</div>
-        <div v-else>Brak mediów w tym katalogu.</div>
+        <div v-if="searchMode">{{ t('library.no_results', { q }) }}</div>
+        <div v-else>{{ t('library.no_media') }}</div>
       </div>
     </template>
   </main>
@@ -117,6 +117,7 @@ import MediaCard from '@/components/MediaCard.vue'
 import LibThumb from '@/components/LibThumb.vue'
 import { useAuthStore } from '@/stores/auth'
 import { bumpThumbs } from '@/composables/media.js'
+import { t } from '@/i18n'
 
 const route = useRoute()
 const router = useRouter()
@@ -201,8 +202,6 @@ const metaNotice = ref('')
 const metaSource = ref(localStorage.getItem('flycast_meta_source') || 'imdb')
 let metaTimer = null
 watch(metaSource, (v) => localStorage.setItem('flycast_meta_source', v))
-// Movie/series libraries render portrait (9:16) cover thumbnails; home-style
-// libraries keep the landscape 16:9 frame thumbnails.
 const isPosterLib = computed(() => mediaType.value === 'movies' || mediaType.value === 'tv')
 
 const canFetchMetadata = computed(
@@ -224,8 +223,8 @@ async function fetchLibraryMetadata() {
     pollMetaJob()
   } catch (e) {
     metaNotice.value = e.response?.data?.err === 'busy'
-      ? 'Pobieranie już trwa.'
-      : 'Nie udało się rozpocząć.'
+      ? t('library.busy')
+      : t('library.failed_start')
   }
 }
 
@@ -239,7 +238,7 @@ function pollMetaJob() {
         pollMetaJob()
       } else {
         bumpThumbs()
-        metaNotice.value = `Gotowe: ${res.data.updated} zaktualizowano, ${res.data.failed} bez zmian.`
+        metaNotice.value = t('library.meta_progress_done', { updated: res.data.updated, failed: res.data.failed })
         setTimeout(() => (metaNotice.value = ''), 8000)
         await load()
       }
@@ -291,7 +290,6 @@ async function load() {
     videos.value = items.filter((x) => x.type === 'video')
     mediaType.value = res.data.media_type || ''
     libraryId.value = res.data.library_id || ''
-    // full breadcrumb chain: library root -> ... -> current folder
     crumbs.value = (res.data.crumbs || []).map((c) => ({
       name: c.name,
       q: { folder: c.id, name: c.name }

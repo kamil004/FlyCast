@@ -1,10 +1,10 @@
 <template>
   <main class="page">
     <div class="crumbs">
-      <span>Ulubione</span>
+      <span>{{ t('favorites.title') }}</span>
     </div>
 
-    <div v-if="loading" class="loading">Ładowanie...</div>
+    <div v-if="loading" class="loading">{{ t('favorites.loading') }}</div>
 
     <div v-else-if="visible.length" class="grid">
       <MediaCard v-for="v in visible" :key="v.id" :item="v" />
@@ -12,7 +12,7 @@
 
     <div v-else class="empty">
       <div class="big">⭐</div>
-      <div>Brak ulubionych. Dodaj gwiazdką na miniaturce.</div>
+      <div>{{ t('favorites.empty') }}</div>
     </div>
   </main>
 </template>
@@ -22,6 +22,7 @@ import { computed, onMounted, ref } from 'vue'
 import axios from 'axios'
 import MediaCard from '@/components/MediaCard.vue'
 import { useFavoritesStore } from '@/stores/favorites'
+import { t } from '@/i18n'
 
 const fav = useFavoritesStore()
 const items = ref([])

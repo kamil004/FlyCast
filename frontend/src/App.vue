@@ -7,20 +7,24 @@
     <button
       v-if="!sidebarOpen"
       class="sidebar-tab"
-      title="Pokaż menu"
+      :title="t('topbar.show_menu')"
       @click="toggleSidebar"
     >›</button>
     <div class="content">
       <header class="topbar">
         <span class="page-title">{{ pageTitle }}</span>
-        <button v-if="showBack" class="back-btn" title="Wstecz" @click="goBack">← Wstecz</button>
+        <button v-if="showBack" class="back-btn" :title="t('topbar.back')" @click="goBack">{{ t('topbar.back') }}</button>
         <div class="topbar-right">
-          <span v-if="appVersion" class="app-ver" title="Wersja aplikacji">v{{ appVersion }}</span>
+          <div class="lang-switch">
+            <button class="lang-btn" :class="{ active: lang === 'en' }" @click="setLanguage('en')">EN</button>
+            <button class="lang-btn" :class="{ active: lang === 'pl' }" @click="setLanguage('pl')">PL</button>
+          </div>
+          <span v-if="appVersion" class="app-ver" :title="t('app.version')">v{{ appVersion }}</span>
           <div class="search">
             <span class="ico">🔎</span>
             <input
               v-model="query"
-              placeholder="Szukaj filmów..."
+              :placeholder="t('topbar.search')"
               @keyup.enter="doSearch"
             />
           </div>
@@ -32,11 +36,12 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useFavoritesStore } from '@/stores/favorites'
 import AppSidebar from '@/components/AppSidebar.vue'
+import { t, getLanguage, setLanguage } from '@/i18n'
 
 const auth = useAuthStore()
 const fav = useFavoritesStore()
@@ -44,6 +49,19 @@ const route = useRoute()
 const router = useRouter()
 const query = ref('')
 const appVersion = import.meta.env.VITE_FLYCAST_VERSION || ''
+const lang = ref(getLanguage())
+
+function onLangChange(e) {
+  lang.value = e.detail.lang
+}
+
+onMounted(() => {
+  window.addEventListener('languagechange', onLangChange)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('languagechange', onLangChange)
+})
 
 function initialSidebar() {
   const saved = localStorage.getItem('flycast_sidebar')
@@ -78,16 +96,16 @@ watch(
 )
 
 const titles = {
-  home: 'Strona główna',
-  library: 'Biblioteka',
-  albums: 'Albumy',
-  'album-view': 'Album',
-  favorites: 'Ulubione',
-  detail: 'Szczegóły',
-  player: 'Odtwarzacz',
-  settings: 'Ustawienia'
+  home: 'nav.home',
+  library: 'nav.library',
+  albums: 'nav.albums',
+  'album-view': 'nav.album',
+  favorites: 'nav.favorites',
+  detail: 'nav.details',
+  player: 'nav.player',
+  settings: 'nav.settings'
 }
-const pageTitle = computed(() => titles[route.name] || 'FlyCast')
+const pageTitle = computed(() => t(titles[route.name] || 'app.title'))
 
 // Pages that are "deeper" than the main navigation get a back button so the
 // user can always step back (detail page, player, album, folder browsing).
@@ -159,7 +177,33 @@ function doSearch() {
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+}
+.lang-switch {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.lang-btn {
+  background: var(--bg-2);
+  border: none;
+  color: var(--dim);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 7px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  line-height: 1;
+}
+.lang-btn:hover {
+  color: var(--text);
+}
+.lang-btn.active {
+  background: var(--accent);
+  color: #fff;
 }
 .app-ver {
   font-size: 12px;
